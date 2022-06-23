@@ -1,7 +1,7 @@
 import { FC } from "react";
 import { Header as MantineHeader, Title } from "@mantine/core";
 import Avatar from "../Avatar";
-import styles from "./Header.module.scss";
+import styles from "../../styles/Header.module.scss";
 
 const Header: FC = () => {
   return (

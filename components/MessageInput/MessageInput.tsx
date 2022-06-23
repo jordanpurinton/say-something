@@ -1,6 +1,6 @@
 import { FC, ChangeEvent, useState } from "react";
 import { Textarea } from "@mantine/core";
-import styles from "./MessageInput.module.scss";
+import styles from "../../styles/MessageInput.module.scss";
 import { MAX_MESSAGE_LENGTH } from "../../constants/message-input";
 
 const MessageInput: FC = () => {
