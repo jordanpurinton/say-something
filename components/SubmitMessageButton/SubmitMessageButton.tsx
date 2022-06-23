@@ -4,7 +4,11 @@ import { Message } from "tabler-icons-react";
 
 const SubmitMessageButton: FC = () => {
   return (
-    <Button color="indigo" size="md" rightIcon={<Message />}>
+    <Button
+      color="indigo"
+      size="md"
+      rightIcon={<Message />}
+    >
       Submit
     </Button>
   );
