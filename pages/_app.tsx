@@ -1,7 +1,9 @@
 import { AppProps } from "next/app";
 import Head from "next/head";
-import { MantineProvider } from "@mantine/core";
+import { AppShell, MantineProvider } from "@mantine/core";
 import { UserProvider } from "@auth0/nextjs-auth0";
+import Header from "../components/Header";
+import "../styles/globals.css";
 
 const App = (props: AppProps) => {
   const { Component, pageProps } = props;
@@ -12,7 +14,7 @@ const App = (props: AppProps) => {
         <title>Say Something</title>
         <meta
           name="viewport"
-          content="minimum-scale=1, initial-scale=1, width=device-width"
+          content="minimum-scale=1, initial-scale=1, width=device-width, height=device-height"
         />
       </Head>
 
@@ -24,7 +26,9 @@ const App = (props: AppProps) => {
         }}
       >
         <UserProvider>
-          <Component {...pageProps} />
+          <AppShell padding="md" header={<Header />}>
+            <Component {...pageProps} />
+          </AppShell>
         </UserProvider>
       </MantineProvider>
     </>

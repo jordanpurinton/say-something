@@ -1,12 +1,13 @@
 import { Container } from "@mantine/core";
 import { FC, ReactNode } from "react";
+import styles from "./HomeContainer.module.scss";
 
 interface HomeContainerProps {
   children: ReactNode;
 }
 
 const HomeContainer: FC<HomeContainerProps> = ({ children }) => {
-  return <Container>{children}</Container>;
+  return <Container className={styles.flexContainer}>{children}</Container>;
 };
 
 export default HomeContainer;
