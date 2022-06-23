@@ -5,7 +5,7 @@ import styles from "./Header.module.scss";
 
 const Header: FC = () => {
   return (
-    <MantineHeader className={styles.header} color="grape" height={60} p="xs">
+    <MantineHeader className={styles.header} height={60} p="xs">
       <Title order={2}>Say Something</Title>
       <Avatar />
     </MantineHeader>

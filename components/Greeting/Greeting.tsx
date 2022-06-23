@@ -8,7 +8,7 @@ const Greeting: FC = () => {
   return (
     <>
       <Title order={3}>Hello {user?.name},</Title>
-      <Title order={3}>say something...</Title>
+      <p>say something...</p>
     </>
   );
 };

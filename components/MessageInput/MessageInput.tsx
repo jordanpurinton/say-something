@@ -1,20 +1,20 @@
 import { FC, ChangeEvent, useState } from "react";
-import { Input } from "@mantine/core";
-import { Message } from "tabler-icons-react";
+import { Textarea } from "@mantine/core";
 import styles from "./MessageInput.module.scss";
+import { MAX_MESSAGE_LENGTH } from "../../constants/message-input";
 
 const MessageInput: FC = () => {
   // eslint-disable-next-line no-unused-vars
   const [message, setMessage] = useState("");
 
   return (
-    <Input
+    <Textarea
       className={styles.messageInput}
-      onChange={(e: ChangeEvent<HTMLInputElement>) =>
+      onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
         setMessage(e.target.value)
       }
-      placeholder="Enter a message..."
-      icon={<Message />}
+      label={`(${message.length} / ${MAX_MESSAGE_LENGTH})`}
+      maxLength={MAX_MESSAGE_LENGTH}
     />
   );
 };
