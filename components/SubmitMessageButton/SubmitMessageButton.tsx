@@ -1,14 +1,16 @@
-import { FC } from "react";
+import { FC, useCallback } from "react";
 import { Button } from "@mantine/core";
 import { Message } from "tabler-icons-react";
+import { asyncHandler } from "../../util";
 
 const SubmitMessageButton: FC = () => {
+  const handleClick = useCallback(async () => {
+    
+    asyncHandler(fetch("/api/createMessage"));
+  }, []);
+
   return (
-    <Button
-      color="indigo"
-      size="md"
-      rightIcon={<Message />}
-    >
+    <Button onClick={handleClick} size="md" rightIcon={<Message />}>
       Submit
     </Button>
   );

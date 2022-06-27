@@ -23,6 +23,7 @@ const App = (props: AppProps) => {
         withNormalizeCSS
         theme={{
           colorScheme: "light",
+          primaryColor: "indigo",
         }}
       >
         <UserProvider>
