@@ -5,6 +5,7 @@ import MessageInput from '../components/MessageInput';
 import SubmitMessageButton from '../components/SubmitMessageButton';
 import HomeContainer from '../containers/HomeContainer';
 import Greeting from '../components/Greeting';
+import Nickname from '../components/Nickname';
 import { useUser } from '@auth0/nextjs-auth0';
 
 const Index: NextPage = () => {
@@ -27,9 +28,9 @@ const Index: NextPage = () => {
           <Space h="md" />
           <MessageInput />
           <Space h="md" />
-          <Center>
-            <SubmitMessageButton />
-          </Center>
+          <Nickname />
+          <Space h="md" />
+          <SubmitMessageButton />
         </HomeContainer>
       </main>
     </div>

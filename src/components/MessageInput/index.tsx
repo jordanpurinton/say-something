@@ -1,18 +1,19 @@
-import { FC, ChangeEvent, useState } from 'react';
+import { FC, ChangeEvent } from 'react';
 import { Textarea } from '@mantine/core';
 import styles from '../../styles/MessageInput.module.scss';
 import { MAX_MESSAGE_LENGTH } from '../../constants/message-input';
+import { useMessageContent } from '../../context/AppContext';
 
 const MessageInput: FC = () => {
-  const [message, setMessage] = useState('');
+  const { messageContent, setMessageContent } = useMessageContent();
 
   return (
     <Textarea
       className={styles.messageInput}
       onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
-        setMessage(e.target.value)
+        setMessageContent(e.target.value)
       }
-      label={`(${message.length} / ${MAX_MESSAGE_LENGTH})`}
+      label={`(${messageContent.length} / ${MAX_MESSAGE_LENGTH})`}
       maxLength={MAX_MESSAGE_LENGTH}
     />
   );

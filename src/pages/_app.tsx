@@ -6,6 +6,8 @@ import { withTRPC } from '@trpc/next';
 import { AppType } from 'next/dist/shared/lib/utils';
 import { AppRouter } from '../backend/router';
 import '../styles/globals.css';
+import { AppProvider } from '../context/AppContext';
+import { NotificationsProvider } from '@mantine/notifications';
 
 const App: AppType = ({ Component, pageProps }) => {
   return (
@@ -27,9 +29,13 @@ const App: AppType = ({ Component, pageProps }) => {
         }}
       >
         <UserProvider>
-          <AppShell padding="md" header={<Header />}>
-            <Component {...pageProps} />
-          </AppShell>
+          <AppProvider>
+            <NotificationsProvider>
+              <AppShell padding="md" header={<Header />}>
+                <Component {...pageProps} />
+              </AppShell>
+            </NotificationsProvider>
+          </AppProvider>
         </UserProvider>
       </MantineProvider>
     </>
