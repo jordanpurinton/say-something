@@ -1,10 +1,10 @@
-import { FC, useCallback } from "react";
-import { Button } from "@mantine/core";
-import { Message } from "tabler-icons-react";
-import { trpc } from "../../utils/trpc";
+import { FC, useCallback } from 'react';
+import { Button } from '@mantine/core';
+import { Message } from 'tabler-icons-react';
+import { trpc } from '../../utils/trpc';
 
 const RandomMessageButton: FC = () => {
-  const { data, error, refetch } = trpc.useQuery(["get-random-message"], {
+  const { data, error, refetch } = trpc.useQuery(['get-random-message'], {
     enabled: false,
   });
 

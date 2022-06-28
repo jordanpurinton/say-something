@@ -1,10 +1,10 @@
-import * as trpc from "@trpc/server";
-import { prisma } from "../utils/prisma";
-import { z } from "zod";
+import * as trpc from '@trpc/server';
+import { prisma } from '../utils/prisma';
+import { z } from 'zod';
 
 export const appRouter = trpc
   .router()
-  .mutation("create-message", {
+  .mutation('create-message', {
     input: z.object({
       content: z.string(),
       views: z.number(),
@@ -21,7 +21,7 @@ export const appRouter = trpc
       return { success: true, message };
     },
   })
-  .query("get-random-message", {
+  .query('get-random-message', {
     async resolve() {
       const count = await prisma.message.count();
       const id = Math.floor(Math.random() * count) + 1;

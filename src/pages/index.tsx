@@ -1,11 +1,11 @@
-import type { NextPage } from "next";
-import Head from "next/head";
-import { Center, Space } from "@mantine/core";
-import MessageInput from "../components/MessageInput";
-import SubmitMessageButton from "../components/SubmitMessageButton";
-import HomeContainer from "../containers/HomeContainer";
-import Greeting from "../components/Greeting";
-import { useUser } from "@auth0/nextjs-auth0";
+import type { NextPage } from 'next';
+import Head from 'next/head';
+import { Center, Space } from '@mantine/core';
+import MessageInput from '../components/MessageInput';
+import SubmitMessageButton from '../components/SubmitMessageButton';
+import HomeContainer from '../containers/HomeContainer';
+import Greeting from '../components/Greeting';
+import { useUser } from '@auth0/nextjs-auth0';
 
 const Index: NextPage = () => {
   const { isLoading } = useUser();

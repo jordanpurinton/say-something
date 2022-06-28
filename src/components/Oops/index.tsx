@@ -1,7 +1,7 @@
-import { Button } from "@mantine/core";
-import { useRouter } from "next/router";
-import { FC } from "react";
-import { ArrowRight } from "tabler-icons-react";
+import { Button } from '@mantine/core';
+import { useRouter } from 'next/router';
+import { FC } from 'react';
+import { ArrowRight } from 'tabler-icons-react';
 
 const Oops: FC = () => {
   const router = useRouter();
@@ -10,7 +10,7 @@ const Oops: FC = () => {
       <h1>Oops</h1>
       <p>Sorry, something went wrong.</p>
       <br />
-      <Button rightIcon={<ArrowRight />} onClick={() => router.push("/")}>
+      <Button rightIcon={<ArrowRight />} onClick={() => router.push('/')}>
         Go Back
       </Button>
     </div>

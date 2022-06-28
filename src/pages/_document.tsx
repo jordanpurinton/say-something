@@ -4,8 +4,8 @@ import Document, {
   Html,
   Main,
   NextScript,
-} from "next/document";
-import { ServerStyles, createStylesServer } from "@mantine/next";
+} from 'next/document';
+import { ServerStyles, createStylesServer } from '@mantine/next';
 
 const stylesServer = createStylesServer();
 

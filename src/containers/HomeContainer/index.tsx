@@ -1,6 +1,6 @@
-import { Container } from "@mantine/core";
-import { FC, ReactNode } from "react";
-import styles from "../../styles/HomeContainer.module.scss";
+import { Container } from '@mantine/core';
+import { FC, ReactNode } from 'react';
+import styles from '../../styles/HomeContainer.module.scss';
 
 interface HomeContainerProps {
   children: ReactNode;

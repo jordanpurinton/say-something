@@ -1,11 +1,10 @@
-import { FC, ChangeEvent, useState } from "react";
-import { Textarea } from "@mantine/core";
-import styles from "../../styles/MessageInput.module.scss";
-import { MAX_MESSAGE_LENGTH } from "../../constants/message-input";
+import { FC, ChangeEvent, useState } from 'react';
+import { Textarea } from '@mantine/core';
+import styles from '../../styles/MessageInput.module.scss';
+import { MAX_MESSAGE_LENGTH } from '../../constants/message-input';
 
 const MessageInput: FC = () => {
-  // eslint-disable-next-line no-unused-vars
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState('');
 
   return (
     <Textarea

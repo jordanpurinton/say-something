@@ -1,6 +1,6 @@
-import { useUser } from "@auth0/nextjs-auth0";
-import { Title } from "@mantine/core";
-import { FC } from "react";
+import { useUser } from '@auth0/nextjs-auth0';
+import { Title } from '@mantine/core';
+import { FC } from 'react';
 
 const Greeting: FC = () => {
   const { user } = useUser();

@@ -1,7 +1,7 @@
-import { useUser } from "@auth0/nextjs-auth0";
-import { Avatar as MantineAvatar } from "@mantine/core";
-import { FC } from "react";
-import styles from "../../styles/Avatar.module.scss";
+import { useUser } from '@auth0/nextjs-auth0';
+import { Avatar as MantineAvatar } from '@mantine/core';
+import { FC } from 'react';
+import styles from '../../styles/Avatar.module.scss';
 
 const Avatar: FC = () => {
   const { user } = useUser();
