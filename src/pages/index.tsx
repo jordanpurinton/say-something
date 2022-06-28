@@ -6,12 +6,9 @@ import SubmitMessageButton from "../components/SubmitMessageButton";
 import HomeContainer from "../containers/HomeContainer";
 import Greeting from "../components/Greeting";
 import { useUser } from "@auth0/nextjs-auth0";
-import { trpc } from "../utils/trpc";
-import { useEffect } from "react";
 
 const Index: NextPage = () => {
   const { isLoading } = useUser();
-  // const hello = trpc.useQuery(["hello", { text: "client" }]);
 
   if (isLoading) {
     return <Center>Loading...</Center>;

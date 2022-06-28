@@ -9,6 +9,7 @@ const Oops: FC = () => {
     <div>
       <h1>Oops</h1>
       <p>Sorry, something went wrong.</p>
+      <br />
       <Button rightIcon={<ArrowRight />} onClick={() => router.push("/")}>
         Go Back
       </Button>

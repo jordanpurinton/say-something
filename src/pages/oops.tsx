@@ -1,5 +1,5 @@
 import { NextPage } from "next";
-import Oops from "../components/Oops/Oops";
+import Oops from "../components/Oops";
 
 const oops: NextPage = () => {
   return <Oops />;
