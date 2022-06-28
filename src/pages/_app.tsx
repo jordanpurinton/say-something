@@ -1,13 +1,13 @@
-import { AppProps } from "next/app";
 import Head from "next/head";
 import { AppShell, MantineProvider } from "@mantine/core";
 import { UserProvider } from "@auth0/nextjs-auth0";
 import Header from "../components/Header";
+import { withTRPC } from "@trpc/next";
+import { AppType } from "next/dist/shared/lib/utils";
+import { AppRouter } from "../backend/router";
 import "../styles/globals.css";
 
-const App = (props: AppProps) => {
-  const { Component, pageProps } = props;
-
+const App: AppType = ({ Component, pageProps }) => {
   return (
     <>
       <Head>
@@ -36,4 +36,15 @@ const App = (props: AppProps) => {
   );
 };
 
-export default App;
+export default withTRPC<AppRouter>({
+  config({ ctx }) {
+    const url = process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}/api/trpc`
+      : "http://localhost:3000/api/trpc";
+
+    return {
+      url,
+    };
+  },
+  ssr: false,
+})(App);
