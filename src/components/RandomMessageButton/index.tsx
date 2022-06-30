@@ -29,6 +29,6 @@ export const RandomMessageButton: FC = () => {
       )}
     </>
   );
-}
+};
 
 export default RandomMessageButton;
