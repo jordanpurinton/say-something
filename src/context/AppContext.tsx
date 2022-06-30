@@ -11,6 +11,8 @@ interface AppState {
   setMessageContent: Dispatch<SetStateAction<string>>;
   nickname: string;
   setNickname: Dispatch<SetStateAction<string>>;
+  randomMessageModalIsOpen: boolean;
+  setRandomMessageModalIsOpen: Dispatch<SetStateAction<boolean>>;
 }
 
 const AppContext = createContext<AppState>({
@@ -18,12 +20,16 @@ const AppContext = createContext<AppState>({
   setMessageContent: () => {},
   nickname: '',
   setNickname: () => {},
+  randomMessageModalIsOpen: false,
+  setRandomMessageModalIsOpen: () => {},
 });
 
 export const AppProvider = (props: any) => {
   const { children } = props;
   const [messageContent, setMessageContent] = useState<string>('');
   const [nickname, setNickname] = useState<string>('');
+  const [randomMessageModalIsOpen, setRandomMessageModalIsOpen] =
+    useState<boolean>(false);
 
   return (
     <AppContext.Provider
@@ -32,6 +38,8 @@ export const AppProvider = (props: any) => {
         setMessageContent,
         nickname,
         setNickname,
+        randomMessageModalIsOpen,
+        setRandomMessageModalIsOpen,
       }}
     >
       {children}
@@ -47,4 +55,10 @@ export const useMessageContent = () => {
 export const useNickname = () => {
   const { nickname, setNickname } = useContext(AppContext);
   return { nickname, setNickname };
+};
+
+export const useRandomMessageModalIsOpen = () => {
+  const { randomMessageModalIsOpen, setRandomMessageModalIsOpen } =
+    useContext(AppContext);
+  return { randomMessageModalIsOpen, setRandomMessageModalIsOpen };
 };

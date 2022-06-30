@@ -2,29 +2,34 @@ import { FC, useCallback, useMemo } from 'react';
 import { Button } from '@mantine/core';
 import { Message } from 'tabler-icons-react';
 import { trpc } from '../../utils/trpc';
-import { useMessageContent, useNickname } from '../../context/AppContext';
+import { useMessageContent } from '../../context/AppContext';
 import { showNotification } from '@mantine/notifications';
+import { useSession } from 'next-auth/react';
 
-const SubmitMessageButton: FC = () => {
-  const createMessageMutation = trpc.useMutation('create-message');
+export const SubmitMessageButton: FC = () => {
+  const createMessageMutation = trpc.useMutation('message.create');
+  const { data: session } = useSession();
   const { messageContent } = useMessageContent();
-  const { nickname } = useNickname();
 
   const shouldDisable = useMemo(() => {
     return messageContent.trim().length === 0;
-  }, [messageContent, nickname]);
+  }, [messageContent]);
 
   const handleClick = useCallback(async () => {
     await createMessageMutation.mutateAsync({
       content: messageContent,
-      views: 0,
-      sentBy: nickname || 'Anonymous',
+      author: {
+        id: '1234',
+        // todo: fix this
+        name: session?.user?.name ?? 'Anonymous',
+        email: session?.user?.email ?? 'None',
+      },
     });
     showNotification({
       title: 'Sweet!',
       message: 'Message successfully sent',
     });
-  }, [createMessageMutation]);
+  }, [createMessageMutation, messageContent, session?.user]);
 
   return (
     <Button

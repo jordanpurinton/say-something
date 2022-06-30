@@ -1,8 +1,8 @@
 import { TextInput } from '@mantine/core';
-import React from 'react';
+import React, { FC } from 'react';
 import { useNickname } from '../../context/AppContext';
 
-const Nickname: React.FC = () => {
+export const Nickname: FC = () => {
   const { nickname, setNickname } = useNickname();
   return (
     <TextInput

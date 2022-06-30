@@ -1,27 +1,23 @@
-import * as trpc from '@trpc/server';
-import { prisma } from '../utils/prisma';
+import { createRouter } from './context';
+import { prisma } from '../db/prisma';
 import { z } from 'zod';
 
-export const appRouter = trpc
-  .router()
-  .mutation('create-message', {
+export const message = createRouter()
+  .mutation('create', {
     input: z.object({
       content: z.string(),
-      views: z.number(),
-      sentBy: z.string(),
+      author: z.object({
+        id: z.string(),
+        name: z.string(),
+        email: z.string(),
+      }),
     }),
     async resolve({ input }) {
-      const message = await prisma.message.create({
-        data: {
-          content: input.content,
-          views: input.views,
-          sentBy: input.sentBy,
-        },
-      });
+      const message = await prisma.message.create({ data: { ...input } });
       return { success: true, message };
     },
   })
-  .query('get-random-message', {
+  .query('get-random', {
     async resolve() {
       const count = await prisma.message.count();
       const id = Math.floor(Math.random() * count) + 1;
@@ -37,6 +33,3 @@ export const appRouter = trpc
       return { success: true, message: message[0] };
     },
   });
-
-// export type definition of API
-export type AppRouter = typeof appRouter;

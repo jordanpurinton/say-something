@@ -1,13 +1,13 @@
-import { useUser } from '@auth0/nextjs-auth0';
 import { Title } from '@mantine/core';
+import { useSession } from 'next-auth/react';
 import { FC } from 'react';
 
-const Greeting: FC = () => {
-  const { user } = useUser();
+export const Greeting: FC = () => {
+  const { data: session } = useSession();
 
   return (
     <>
-      <Title order={3}>Hello {user?.name},</Title>
+      <Title order={3}>Hello {session?.user?.name || 'Anonymous'},</Title>
       <p>say something...</p>
     </>
   );

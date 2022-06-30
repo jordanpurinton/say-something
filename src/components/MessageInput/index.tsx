@@ -1,10 +1,10 @@
-import { FC, ChangeEvent } from 'react';
+import { ChangeEvent, FC } from 'react';
 import { Textarea } from '@mantine/core';
 import styles from '../../styles/MessageInput.module.scss';
 import { MAX_MESSAGE_LENGTH } from '../../constants/message-input';
 import { useMessageContent } from '../../context/AppContext';
 
-const MessageInput: FC = () => {
+export const MessageInput: FC = () => {
   const { messageContent, setMessageContent } = useMessageContent();
 
   return (

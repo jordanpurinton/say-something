@@ -6,12 +6,13 @@ import SubmitMessageButton from '../components/SubmitMessageButton';
 import HomeContainer from '../containers/HomeContainer';
 import Greeting from '../components/Greeting';
 import Nickname from '../components/Nickname';
-import { useUser } from '@auth0/nextjs-auth0';
+import { useSession } from 'next-auth/react';
+import RandomMessageButton from '../components/RandomMessageButton';
 
 const Index: NextPage = () => {
-  const { isLoading } = useUser();
+  const { status } = useSession();
 
-  if (isLoading) {
+  if (status === 'loading') {
     return <Center>Loading...</Center>;
   }
 
@@ -31,6 +32,8 @@ const Index: NextPage = () => {
           <Nickname />
           <Space h="md" />
           <SubmitMessageButton />
+          <Space h="md" />
+          <RandomMessageButton />
         </HomeContainer>
       </main>
     </div>

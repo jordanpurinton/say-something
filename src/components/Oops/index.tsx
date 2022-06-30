@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { FC } from 'react';
 import { ArrowRight } from 'tabler-icons-react';
 
-const Oops: FC = () => {
+export const Oops: FC = () => {
   const router = useRouter();
   return (
     <div>
@@ -16,4 +16,5 @@ const Oops: FC = () => {
     </div>
   );
 };
+
 export default Oops;

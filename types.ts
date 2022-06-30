@@ -1,9 +1,21 @@
 export interface Message {
-  id?: number;
+  id: number;
+  createdAt: Date;
   content: string;
-  email: string;
-  last_viewed_time: string;
-  sender: string;
-  sent_time: string;
   views: number;
+  upvotes: number;
+  downvotes: number;
+  author: any; // todo: fixme
+  authorId: string;
+  // viewedBy: any[]; // todo: fixme
+}
+
+export interface User {
+  id: number;
+  name: string;
+  nickname: string;
+  isUserTimedOut: boolean;
+  timeoutExpiry: Date;
+  sentMessages: Message[];
+  viewedMessages: Message[];
 }

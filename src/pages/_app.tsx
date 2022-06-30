@@ -1,15 +1,16 @@
 import Head from 'next/head';
 import { AppShell, MantineProvider } from '@mantine/core';
-import { UserProvider } from '@auth0/nextjs-auth0';
 import Header from '../components/Header';
 import { withTRPC } from '@trpc/next';
 import { AppType } from 'next/dist/shared/lib/utils';
-import { AppRouter } from '../backend/router';
+import { AppRouter } from '../server/router';
 import '../styles/globals.css';
 import { AppProvider } from '../context/AppContext';
 import { NotificationsProvider } from '@mantine/notifications';
+import { getSession, GetSessionParams, SessionProvider } from 'next-auth/react';
+import superjson from 'superjson';
 
-const App: AppType = ({ Component, pageProps }) => {
+const App: AppType = ({ Component, pageProps: { session, ...pageProps } }) => {
   return (
     <>
       <Head>
@@ -28,7 +29,7 @@ const App: AppType = ({ Component, pageProps }) => {
           primaryColor: 'indigo',
         }}
       >
-        <UserProvider>
+        <SessionProvider session={session}>
           <AppProvider>
             <NotificationsProvider>
               <AppShell padding="md" header={<Header />}>
@@ -36,21 +37,46 @@ const App: AppType = ({ Component, pageProps }) => {
               </AppShell>
             </NotificationsProvider>
           </AppProvider>
-        </UserProvider>
+        </SessionProvider>
       </MantineProvider>
     </>
   );
 };
 
+const getBaseUrl = () => {
+  if (typeof window !== 'undefined') {
+    return '';
+  }
+  if (process.browser) return ''; // Browser should use current path
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`; // SSR should use vercel url
+
+  return `http://localhost:${process.env.PORT ?? 3000}`; // dev SSR should use localhost
+};
+
 export default withTRPC<AppRouter>({
   config({ ctx }) {
-    const url = process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}/api/trpc`
-      : 'http://localhost:3000/api/trpc';
+    const url = `${getBaseUrl()}/api/trpc`;
 
     return {
       url,
+      transformer: superjson,
     };
   },
   ssr: false,
 })(App);
+
+export async function getServerSideProps(context: GetSessionParams) {
+  const session = await getSession(context);
+
+  if (!session) {
+    return {
+      redirect: {
+        destination: '/api/auth/login',
+      },
+    };
+  }
+
+  return {
+    props: { session },
+  };
+}
