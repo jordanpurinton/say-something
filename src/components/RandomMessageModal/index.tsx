@@ -1,8 +1,8 @@
 import { Button, Modal, Space, Text } from '@mantine/core';
+import { Message } from '@prisma/client';
 import React from 'react';
 import { FC } from 'react';
 import { ThumbDown, ThumbUp } from 'tabler-icons-react';
-import { Message } from '../../../types';
 import { useRandomMessageModalIsOpen } from '../../context/AppContext';
 import styles from '../../styles/RandomMessageModal.module.scss';
 

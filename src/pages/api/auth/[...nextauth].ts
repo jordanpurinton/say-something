@@ -17,8 +17,15 @@ export default NextAuth({
   ],
   callbacks: {
     async session({ session, token }) {
-      session.userId = token.sub;
-      return session;
+      const user = await prisma.user.findUnique({
+        where: {
+          id: token.sub,
+        },
+      });
+      return {
+        ...session,
+        userWithProfile: user,
+      };
     },
   },
 });

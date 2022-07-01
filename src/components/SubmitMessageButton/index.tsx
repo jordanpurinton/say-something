@@ -8,7 +8,7 @@ import { useSession } from 'next-auth/react';
 import { DEFAULT_NICKNAME } from '../../constants';
 
 export const SubmitMessageButton: FC = () => {
-  const { data: session } = useSession();
+  const { data } = useSession();
 
   const createMessageMutation = trpc.useMutation('message.create');
 
@@ -22,14 +22,14 @@ export const SubmitMessageButton: FC = () => {
   const handleClick = useCallback(async () => {
     await createMessageMutation.mutateAsync({
       content: messageContent,
-      userId: session?.userId as string,
+      userId: data?.userId as string,
       nickname: nickname || DEFAULT_NICKNAME,
     });
     showNotification({
       title: 'Nice',
       message: 'Message was sent',
     });
-  }, [createMessageMutation, messageContent, nickname, session?.userId]);
+  }, [createMessageMutation, messageContent, nickname, data?.userId]);
 
   return (
     <Button

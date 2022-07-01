@@ -8,6 +8,7 @@ import Greeting from '../components/Greeting';
 import Nickname from '../components/Nickname';
 import { useSession } from 'next-auth/react';
 import RandomMessageButton from '../components/RandomMessageButton';
+import ViewMessageTimer from '../components/ViewMessageTimer';
 import styles from '../styles/Index.module.scss';
 
 const Index: NextPage = () => {
@@ -36,6 +37,7 @@ const Index: NextPage = () => {
             <SubmitMessageButton />
             <RandomMessageButton />
           </span>
+          <ViewMessageTimer />
         </HomeContainer>
       </main>
     </Container>

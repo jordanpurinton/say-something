@@ -4,13 +4,13 @@ import { FC } from 'react';
 import styles from '../../styles/Avatar.module.scss';
 
 export const Avatar: FC = () => {
-  const { data: session } = useSession();
+  const { data } = useSession();
 
   return (
     <MantineAvatar
       className={styles.avatar}
-      src={session?.user?.image || ''}
-      alt={session?.user?.name || ''}
+      src={data?.user?.image || ''}
+      alt={data?.user?.name || ''}
       size="md"
     />
   );

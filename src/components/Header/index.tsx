@@ -9,11 +9,7 @@ export const Header: FC = () => {
 
   return (
     <MantineHeader className={styles.header} height={60} p="xs">
-      <Button
-        className={styles.headerButton}
-        variant="subtle"
-        onClick={() => router.push('/')}
-      >
+      <Button className={styles.headerButton} onClick={() => router.push('/')}>
         <Title order={2}>Say Something</Title>
       </Button>
       <Avatar />
