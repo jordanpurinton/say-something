@@ -14,6 +14,19 @@ export const message = createRouter()
       return { success: true, message };
     },
   })
+  .query('find', {
+    input: z.object({
+      id: z.number(),
+    }),
+    async resolve({ input }) {
+      const message = await prisma.message.findUnique({
+        where: {
+          id: input.id,
+        },
+      });
+      return { success: true, message };
+    },
+  })
   .query('get-random', {
     async resolve() {
       const count = await prisma.message.count();
@@ -27,6 +40,65 @@ export const message = createRouter()
         },
         take: 1,
       });
+
       return { success: true, message: message[0] };
+    },
+  })
+  .mutation('upvote-message', {
+    input: z.object({
+      id: z.number(),
+    }),
+    async resolve({ input }) {
+      const message = await prisma.message.findFirst({
+        where: {
+          id: {
+            equals: input.id,
+          },
+        },
+      });
+
+      if (!message) {
+        return { success: false, message: 'Message not found' };
+      }
+
+      await prisma.message.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          upvotes: message.upvotes + 1,
+        },
+      });
+
+      return { success: true, message: 'OK' };
+    },
+  })
+  .mutation('downvote-message', {
+    input: z.object({
+      id: z.number(),
+    }),
+    async resolve({ input }) {
+      const message = await prisma.message.findFirst({
+        where: {
+          id: {
+            equals: input.id,
+          },
+        },
+      });
+
+      if (!message) {
+        return { success: false, message: 'Message not found' };
+      }
+
+      await prisma.message.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          downvotes: message.downvotes + 1,
+        },
+      });
+
+      return { success: true, message: 'OK' };
     },
   });

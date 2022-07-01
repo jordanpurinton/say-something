@@ -1,5 +1,5 @@
 import { FC, useCallback, useMemo } from 'react';
-import { Button } from '@mantine/core';
+import { Button, Tooltip } from '@mantine/core';
 import { Message } from 'tabler-icons-react';
 import { trpc } from '../../utils/trpc';
 import { useMessageContent, useNickname } from '../../context/AppContext';
@@ -22,28 +22,35 @@ export const SubmitMessageButton: FC = () => {
   const handleClick = useCallback(async () => {
     await createMessageMutation.mutateAsync({
       content: messageContent,
-      userId: data?.userId as string,
+      userId: data?.userWithProfile.id as string,
       nickname: nickname || DEFAULT_NICKNAME,
     });
     showNotification({
       title: 'Nice',
       message: 'Message was sent',
     });
-  }, [createMessageMutation, messageContent, nickname, data?.userId]);
+  }, [
+    createMessageMutation,
+    messageContent,
+    data?.userWithProfile.id,
+    nickname,
+  ]);
 
   return (
-    <Button
-      disabled={shouldDisable}
-      onClick={handleClick}
-      loading={createMessageMutation.isLoading}
-      rightIcon={<Message />}
-      variant="gradient"
-      gradient={{ from: 'indigo', to: 'cyan' }}
-      loaderPosition="right"
-      size="md"
-    >
-      Send Message
-    </Button>
+    <Tooltip label="Tooltip" withArrow>
+      <Button
+        disabled={shouldDisable}
+        onClick={handleClick}
+        loading={createMessageMutation.isLoading}
+        rightIcon={<Message />}
+        variant="gradient"
+        gradient={{ from: 'indigo', to: 'cyan' }}
+        loaderPosition="right"
+        size="md"
+      >
+        Send Message
+      </Button>
+    </Tooltip>
   );
 };
 

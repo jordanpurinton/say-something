@@ -1,11 +1,11 @@
 import Head from 'next/head';
 import { AppShell, MantineProvider } from '@mantine/core';
-import Header from '../components/Header';
+import Header from '../shared/components/Header';
 import { withTRPC } from '@trpc/next';
 import { AppType } from 'next/dist/shared/lib/utils';
 import { AppRouter } from '../server/router';
-import '../styles/globals.css';
-import { AppProvider } from '../context/AppContext';
+import '../shared/styles/globals.css';
+import { AppProvider } from '../shared/context/AppContext';
 import { NotificationsProvider } from '@mantine/notifications';
 import { SessionProvider } from 'next-auth/react';
 import superjson from 'superjson';

@@ -13,21 +13,22 @@ export const user = createRouter()
     }),
     async resolve({ input }) {
       const derived = {
-        account: prisma.account.findFirst({
+        account: prisma.account.findUnique({
           where: {
             id: input.id,
           },
         }),
-        authorId: input.id,
         sessions: [],
         messages: [],
       };
+
       const user = await prisma.user.create({
         data: {
           ...input,
           ...derived,
         },
       });
+
       return { success: true, user };
     },
   })
@@ -41,6 +42,7 @@ export const user = createRouter()
           id: input.id,
         },
       });
+
       return { success: true, user };
     },
   });

@@ -1,15 +1,16 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { Center, Container, Space } from '@mantine/core';
-import MessageInput from '../components/MessageInput';
-import SubmitMessageButton from '../components/SubmitMessageButton';
-import HomeContainer from '../containers/HomeContainer';
-import Greeting from '../components/Greeting';
-import Nickname from '../components/Nickname';
+import MessageInput from '../shared/components/MessageInput';
+import SubmitMessageButton from '../shared/components/SubmitMessageButton';
+import HomeContainer from '../shared/containers/HomeContainer';
+import Greeting from '../shared/components/Greeting';
+import Nickname from '../shared/components/Nickname';
 import { useSession } from 'next-auth/react';
-import RandomMessageButton from '../components/RandomMessageButton';
-import ViewMessageTimer from '../components/ViewMessageTimer';
-import styles from '../styles/Index.module.scss';
+import RandomMessageButton from '../shared/components/RandomMessageButton';
+import ViewMessageTimer from '../shared/components/ViewMessageTimer';
+import styles from '../shared/styles/Index.module.scss';
+import SendMessageTimer from '../shared/components/SendMessageTimer';
 
 const Index: NextPage = () => {
   const { status } = useSession();
@@ -37,6 +38,7 @@ const Index: NextPage = () => {
             <SubmitMessageButton />
             <RandomMessageButton />
           </span>
+          <SendMessageTimer />
           <ViewMessageTimer />
         </HomeContainer>
       </main>
