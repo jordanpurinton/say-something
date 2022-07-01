@@ -2,14 +2,18 @@ import { FC, useCallback, useMemo } from 'react';
 import { Button } from '@mantine/core';
 import { Message } from 'tabler-icons-react';
 import { trpc } from '../../utils/trpc';
-import { useMessageContent } from '../../context/AppContext';
+import { useMessageContent, useNickname } from '../../context/AppContext';
 import { showNotification } from '@mantine/notifications';
 import { useSession } from 'next-auth/react';
+import { DEFAULT_NICKNAME } from '../../constants';
 
 export const SubmitMessageButton: FC = () => {
-  const createMessageMutation = trpc.useMutation('message.create');
   const { data: session } = useSession();
+
+  const createMessageMutation = trpc.useMutation('message.create');
+
   const { messageContent } = useMessageContent();
+  const { nickname } = useNickname();
 
   const shouldDisable = useMemo(() => {
     return messageContent.trim().length === 0;
@@ -18,29 +22,27 @@ export const SubmitMessageButton: FC = () => {
   const handleClick = useCallback(async () => {
     await createMessageMutation.mutateAsync({
       content: messageContent,
-      author: {
-        id: '1234',
-        // todo: fix this
-        name: session?.user?.name ?? 'Anonymous',
-        email: session?.user?.email ?? 'None',
-      },
+      userId: session?.userId as string,
+      nickname: nickname || DEFAULT_NICKNAME,
     });
     showNotification({
-      title: 'Sweet!',
-      message: 'Message successfully sent',
+      title: 'Nice',
+      message: 'Message was sent',
     });
-  }, [createMessageMutation, messageContent, session?.user]);
+  }, [createMessageMutation, messageContent, nickname, session?.userId]);
 
   return (
     <Button
       disabled={shouldDisable}
       onClick={handleClick}
       loading={createMessageMutation.isLoading}
-      loaderPosition="right"
       rightIcon={<Message />}
+      variant="gradient"
+      gradient={{ from: 'indigo', to: 'cyan' }}
+      loaderPosition="right"
       size="md"
     >
-      Submit
+      Send Message
     </Button>
   );
 };

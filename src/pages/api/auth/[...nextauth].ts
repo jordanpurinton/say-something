@@ -6,7 +6,6 @@ import { prisma } from '../../../server/db/prisma';
 export default NextAuth({
   session: {
     strategy: 'jwt',
-    maxAge: 3000,
   },
   adapter: PrismaAdapter(prisma),
   providers: [
@@ -16,4 +15,10 @@ export default NextAuth({
       issuer: process.env.AUTH0_ISSUER_BASE_URL,
     }),
   ],
+  callbacks: {
+    async session({ session, token }) {
+      session.userId = token.sub;
+      return session;
+    },
+  },
 });

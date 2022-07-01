@@ -5,9 +5,7 @@ export interface Message {
   views: number;
   upvotes: number;
   downvotes: number;
-  author: any; // todo: fixme
-  authorId: string;
-  // viewedBy: any[]; // todo: fixme
+  nickname?: string;
 }
 
 export interface User {

@@ -1,16 +1,15 @@
 import { FC, useCallback } from 'react';
 import { Button } from '@mantine/core';
-import { Message } from 'tabler-icons-react';
+import { ArrowsShuffle } from 'tabler-icons-react';
 import { trpc } from '../../utils/trpc';
 import { useRandomMessageModalIsOpen } from '../../context/AppContext';
-// fix
 import { RandomMessageModal } from '../RandomMessageModal';
 
 export const RandomMessageButton: FC = () => {
   const { randomMessageModalIsOpen, setRandomMessageModalIsOpen } =
     useRandomMessageModalIsOpen();
 
-  const { data, refetch } = trpc.useQuery(['message.get-random'], {
+  const { data, refetch, isFetching } = trpc.useQuery(['message.get-random'], {
     enabled: false,
   });
 
@@ -21,7 +20,14 @@ export const RandomMessageButton: FC = () => {
 
   return (
     <>
-      <Button onClick={handleClick} size="md" rightIcon={<Message />}>
+      <Button
+        onClick={handleClick}
+        rightIcon={<ArrowsShuffle />}
+        loading={isFetching}
+        loaderPosition="right"
+        size="md"
+        variant="light"
+      >
         View Message
       </Button>
       {randomMessageModalIsOpen && (

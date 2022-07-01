@@ -1,7 +1,7 @@
 import { ChangeEvent, FC } from 'react';
 import { Textarea } from '@mantine/core';
 import styles from '../../styles/MessageInput.module.scss';
-import { MAX_MESSAGE_LENGTH } from '../../constants/message-input';
+import { MAX_MESSAGE_LENGTH } from '../../constants';
 import { useMessageContent } from '../../context/AppContext';
 
 export const MessageInput: FC = () => {
@@ -13,8 +13,9 @@ export const MessageInput: FC = () => {
       onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
         setMessageContent(e.target.value)
       }
-      label={`(${messageContent.length} / ${MAX_MESSAGE_LENGTH})`}
+      label={`Message: (${messageContent.length} / ${MAX_MESSAGE_LENGTH})`}
       maxLength={MAX_MESSAGE_LENGTH}
+      required
     />
   );
 };

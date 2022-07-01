@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "db": "pscale connect say-something main --port 3309",
+    "db push": "npx run db push",
     "postinstall": "prisma generate",
     "prepare": "husky install"
   },

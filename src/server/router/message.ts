@@ -6,11 +6,8 @@ export const message = createRouter()
   .mutation('create', {
     input: z.object({
       content: z.string(),
-      author: z.object({
-        id: z.string(),
-        name: z.string(),
-        email: z.string(),
-      }),
+      userId: z.string(),
+      nickname: z.string(),
     }),
     async resolve({ input }) {
       const message = await prisma.message.create({ data: { ...input } });

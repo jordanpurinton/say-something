@@ -7,7 +7,7 @@ import { AppRouter } from '../server/router';
 import '../styles/globals.css';
 import { AppProvider } from '../context/AppContext';
 import { NotificationsProvider } from '@mantine/notifications';
-import { getSession, GetSessionParams, SessionProvider } from 'next-auth/react';
+import { SessionProvider } from 'next-auth/react';
 import superjson from 'superjson';
 
 const App: AppType = ({ Component, pageProps: { session, ...pageProps } }) => {
@@ -54,7 +54,7 @@ const getBaseUrl = () => {
 };
 
 export default withTRPC<AppRouter>({
-  config({ ctx }) {
+  config() {
     const url = `${getBaseUrl()}/api/trpc`;
 
     return {
@@ -64,19 +64,3 @@ export default withTRPC<AppRouter>({
   },
   ssr: false,
 })(App);
-
-export async function getServerSideProps(context: GetSessionParams) {
-  const session = await getSession(context);
-
-  if (!session) {
-    return {
-      redirect: {
-        destination: '/api/auth/login',
-      },
-    };
-  }
-
-  return {
-    props: { session },
-  };
-}
