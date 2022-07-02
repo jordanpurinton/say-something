@@ -101,4 +101,33 @@ export const message = createRouter()
 
       return { success: true, message: 'OK' };
     },
+  })
+  .mutation('update-views', {
+    input: z.object({
+      id: z.number(),
+    }),
+    async resolve({ input }) {
+      const message = await prisma.message.findFirst({
+        where: {
+          id: {
+            equals: input.id,
+          },
+        },
+      });
+
+      if (!message) {
+        return { success: false, message: 'Message not found' };
+      }
+
+      await prisma.message.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          views: message.views + 1,
+        },
+      });
+
+      return { success: true, message: 'OK' };
+    },
   });

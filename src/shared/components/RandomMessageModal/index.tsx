@@ -1,8 +1,9 @@
 import { Button, Modal, Space, Text } from '@mantine/core';
 import { Message } from '@prisma/client';
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { FC } from 'react';
 import { ThumbDown, ThumbUp } from 'tabler-icons-react';
+import { VoteChoice, Vote } from '../../constants';
 import { useRandomMessageModalIsOpen } from '../../context/AppContext';
 import styles from '../../styles/RandomMessageModal.module.scss';
 import { trpc } from '../../utils/trpc';
@@ -14,11 +15,12 @@ interface Props {
 export const RandomMessageModal: FC<Props> = ({ randomMessage }) => {
   const { randomMessageModalIsOpen, setRandomMessageModalIsOpen } =
     useRandomMessageModalIsOpen();
-  const [isDownvoting, setIsDownvoting] = React.useState(false);
-  const [isUpvoting, setIsUpvoting] = React.useState(false);
+
   const [modalData, setModalData] = React.useState<Message | undefined>(
     randomMessage
   );
+  const [didVote, setDidVote] = React.useState(false);
+  const [voteChoice, setVoteChoice] = React.useState<VoteChoice>();
 
   const { refetch } = trpc.useQuery(
     [
@@ -31,42 +33,69 @@ export const RandomMessageModal: FC<Props> = ({ randomMessage }) => {
       enabled: false,
     }
   );
+
   const downvoteMessageMutation = trpc.useMutation('message.downvote-message');
   const upvoteMessageMutation = trpc.useMutation('message.upvote-message');
+  const updateViewsMutation = trpc.useMutation('message.update-views');
 
-  const handleDownvote = useCallback(async () => {
-    setIsDownvoting(true);
-
-    if (modalData) {
-      await downvoteMessageMutation.mutateAsync({
-        id: modalData.id,
-      });
+  const handleClose = useCallback(async () => {
+    setRandomMessageModalIsOpen((prev) => !prev);
+    if (modalData && voteChoice) {
+      voteChoice === Vote.down
+        ? await downvoteMessageMutation.mutateAsync({ id: modalData.id })
+        : await upvoteMessageMutation.mutateAsync({ id: modalData.id });
     }
+  }, [
+    downvoteMessageMutation,
+    modalData,
+    setRandomMessageModalIsOpen,
+    upvoteMessageMutation,
+    voteChoice,
+  ]);
 
-    const res = await refetch();
-    setModalData(res.data?.message as Message);
-    setIsDownvoting(false);
-  }, [downvoteMessageMutation, modalData, refetch]);
+  const handleOptimisticUpdate = useCallback(
+    async (type: VoteChoice) => {
+      if (didVote && type === voteChoice) return;
 
-  const handleUpvote = useCallback(async () => {
-    setIsUpvoting(true);
+      if (modalData) {
+        const otherType: VoteChoice = type === Vote.down ? Vote.up : Vote.down;
+        const newValue =
+          type === Vote.down ? modalData.downvotes + 1 : modalData.upvotes + 1;
 
-    if (modalData) {
-      await upvoteMessageMutation.mutateAsync({
-        id: modalData.id,
-      });
-    }
+        const newMessageData = {
+          ...modalData,
+          [type as string]: newValue,
+        };
 
-    const res = await refetch();
-    setModalData(res.data?.message as Message);
-    setIsUpvoting(false);
-  }, [modalData, refetch, upvoteMessageMutation]);
+        if (didVote && newMessageData[otherType] > 0) {
+          newMessageData[otherType] -= 1;
+        }
+
+        setModalData(newMessageData as Message);
+        setVoteChoice(type as VoteChoice);
+        setDidVote(true);
+      }
+    },
+    [didVote, modalData, voteChoice]
+  );
+
+  useEffect(() => {
+    const updateViews = async () => {
+      if (modalData) {
+        await updateViewsMutation.mutateAsync({ id: modalData.id });
+        const res = await refetch();
+        setModalData(res.data?.message as Message);
+      }
+    };
+    updateViews();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>
       <Modal
         opened={randomMessageModalIsOpen}
-        onClose={() => setRandomMessageModalIsOpen((prev) => !prev)}
+        onClose={handleClose}
         title="Viewing Daily Message"
         centered
       >
@@ -83,10 +112,13 @@ export const RandomMessageModal: FC<Props> = ({ randomMessage }) => {
         <Space h="md" />
         <div>
           <Button
-            onClick={handleDownvote}
-            rightIcon={<ThumbDown />}
-            className={styles.voteIcon}
-            loading={isDownvoting}
+            onClick={() => handleOptimisticUpdate(Vote.down)}
+            rightIcon={
+              <ThumbDown
+                className={voteChoice === Vote.down ? styles.downFilled : ''}
+              />
+            }
+            className={styles.voteButton}
             loaderPosition="right"
             variant="light"
             color="red"
@@ -94,10 +126,13 @@ export const RandomMessageModal: FC<Props> = ({ randomMessage }) => {
             Bad ({modalData?.downvotes})
           </Button>
           <Button
-            onClick={handleUpvote}
-            rightIcon={<ThumbUp />}
-            className={styles.voteIcon}
-            loading={isUpvoting}
+            onClick={() => handleOptimisticUpdate(Vote.up)}
+            rightIcon={
+              <ThumbUp
+                className={voteChoice === Vote.up ? styles.upFilled : ''}
+              />
+            }
+            className={styles.voteButton}
             loaderPosition="right"
             variant="light"
             color="green"
