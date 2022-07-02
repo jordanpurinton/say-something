@@ -1,8 +1,8 @@
-import { createRouter } from './context';
-import { prisma } from '../db/prisma';
 import { z } from 'zod';
+import { prisma } from '../db/prisma';
+import { createRouter } from './context';
 
-export const message = createRouter()
+export const messageRouter = createRouter()
   .mutation('create', {
     input: z.object({
       content: z.string(),
@@ -10,8 +10,7 @@ export const message = createRouter()
       nickname: z.string(),
     }),
     async resolve({ input }) {
-      const message = await prisma.message.create({ data: { ...input } });
-      return { success: true, message };
+      await prisma.message.create({ data: { ...input } });
     },
   })
   .query('find', {
@@ -49,11 +48,9 @@ export const message = createRouter()
       id: z.number(),
     }),
     async resolve({ input }) {
-      const message = await prisma.message.findFirst({
+      const message = await prisma.message.findUnique({
         where: {
-          id: {
-            equals: input.id,
-          },
+          id: input.id,
         },
       });
 
@@ -69,8 +66,6 @@ export const message = createRouter()
           upvotes: message.upvotes + 1,
         },
       });
-
-      return { success: true, message: 'OK' };
     },
   })
   .mutation('downvote-message', {
@@ -78,11 +73,9 @@ export const message = createRouter()
       id: z.number(),
     }),
     async resolve({ input }) {
-      const message = await prisma.message.findFirst({
+      const message = await prisma.message.findUnique({
         where: {
-          id: {
-            equals: input.id,
-          },
+          id: input.id,
         },
       });
 
@@ -98,8 +91,6 @@ export const message = createRouter()
           downvotes: message.downvotes + 1,
         },
       });
-
-      return { success: true, message: 'OK' };
     },
   })
   .mutation('update-views', {
@@ -107,11 +98,9 @@ export const message = createRouter()
       id: z.number(),
     }),
     async resolve({ input }) {
-      const message = await prisma.message.findFirst({
+      const message = await prisma.message.findUnique({
         where: {
-          id: {
-            equals: input.id,
-          },
+          id: input.id,
         },
       });
 
@@ -127,7 +116,5 @@ export const message = createRouter()
           views: message.views + 1,
         },
       });
-
-      return { success: true, message: 'OK' };
     },
   });

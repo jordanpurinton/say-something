@@ -1,14 +1,14 @@
-import Head from 'next/head';
 import { AppShell, MantineProvider } from '@mantine/core';
-import Header from '../shared/components/Header';
-import { withTRPC } from '@trpc/next';
-import { AppType } from 'next/dist/shared/lib/utils';
-import { AppRouter } from '../server/router';
-import '../shared/styles/globals.css';
-import { AppProvider } from '../shared/context/AppContext';
 import { NotificationsProvider } from '@mantine/notifications';
+import { withTRPC } from '@trpc/next';
 import { SessionProvider } from 'next-auth/react';
+import { AppType } from 'next/dist/shared/lib/utils';
+import Head from 'next/head';
 import superjson from 'superjson';
+import { AppRouter } from '../server/router';
+import Header from '../shared/components/Header';
+import { AppProvider } from '../shared/context/AppContext';
+import '../shared/styles/globals.css';
 
 const App: AppType = ({ Component, pageProps: { session, ...pageProps } }) => {
   return (

@@ -4,7 +4,7 @@ import { FC } from 'react';
 export const Greeting: FC = () => {
   return (
     <>
-      <Title order={1}>Hey there,</Title>
+      <Title order={2}>Howdy,</Title>
       <Text>say something...</Text>
     </>
   );

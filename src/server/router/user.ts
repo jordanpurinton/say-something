@@ -1,8 +1,8 @@
-import { createRouter } from './context';
-import { prisma } from '../db/prisma';
 import { z } from 'zod';
+import { prisma } from '../db/prisma';
+import { createRouter } from './context';
 
-export const user = createRouter()
+export const userRouter = createRouter()
   .mutation('create', {
     input: z.object({
       id: z.string(),
@@ -22,14 +22,12 @@ export const user = createRouter()
         messages: [],
       };
 
-      const user = await prisma.user.create({
+      await prisma.user.create({
         data: {
           ...input,
           ...derived,
         },
       });
-
-      return { success: true, user };
     },
   })
   .query('find', {
@@ -42,7 +40,38 @@ export const user = createRouter()
           id: input.id,
         },
       });
-
       return { success: true, user };
+    },
+  })
+  .mutation('update-can-send-message-timestamp', {
+    input: z.object({
+      id: z.string(),
+      canSendMessageTimestamp: z.string(),
+    }),
+    async resolve({ input }) {
+      await prisma.user.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          canSendMessageTimestamp: input.canSendMessageTimestamp,
+        },
+      });
+    },
+  })
+  .mutation('update-can-view-message-timestamp', {
+    input: z.object({
+      id: z.string(),
+      canViewMessageTimestamp: z.string(),
+    }),
+    async resolve({ input }) {
+      await prisma.user.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          canViewMessageTimestamp: input.canViewMessageTimestamp,
+        },
+      });
     },
   });
