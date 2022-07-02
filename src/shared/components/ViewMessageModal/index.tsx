@@ -1,5 +1,5 @@
 import { Button, Modal, Space, Text } from '@mantine/core';
-import { Message } from '@prisma/client';
+import { Message, User } from '@prisma/client';
 import React, { FC, useCallback, useEffect } from 'react';
 import { ThumbDown, ThumbUp } from 'tabler-icons-react';
 import { Vote, VoteChoice } from '../../constants';
@@ -12,7 +12,7 @@ interface Props {
 }
 
 export const ViewMessageModal: FC<Props> = ({ randomMessage }) => {
-  const { user } = useUser();
+  const { user, setUser } = useUser();
   const { viewMessageModalIsOpen, setViewMessageModalIsOpen } =
     useViewMessageModalIsOpen();
 
@@ -40,8 +40,21 @@ export const ViewMessageModal: FC<Props> = ({ randomMessage }) => {
   const updateCanViewMessageTimestampMutation = trpc.useMutation(
     'user.update-can-view-message-timestamp'
   );
+  const findUserQuery = trpc.useQuery(
+    [
+      'user.find',
+      {
+        id: user?.id as string,
+      },
+    ],
+    {
+      enabled: false,
+    }
+  );
 
   const handleClose = useCallback(async () => {
+    const newUserData = await findUserQuery.refetch();
+    setUser(newUserData.data?.user as User);
     setViewMessageModalIsOpen((prev) => !prev);
     if (modalData && voteChoice) {
       voteChoice === Vote.down

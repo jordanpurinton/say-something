@@ -1,5 +1,6 @@
 import { Button } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
+import { User } from '@prisma/client';
 import { isAfter } from 'date-fns';
 import { FC, useCallback, useMemo } from 'react';
 import { Message } from 'tabler-icons-react';
@@ -12,7 +13,7 @@ import {
 import { trpc } from '../../utils/trpc';
 
 export const SendMessageButton: FC = () => {
-  const { user } = useUser();
+  const { user, setUser } = useUser();
   const { messageContent } = useMessageContent();
   const { nickname } = useNickname();
 
@@ -20,13 +21,24 @@ export const SendMessageButton: FC = () => {
   const updateCanSendMessageTimestampMutation = trpc.useMutation(
     'user.update-can-send-message-timestamp'
   );
+  const findUserQuery = trpc.useQuery(
+    [
+      'user.find',
+      {
+        id: user?.id as string,
+      },
+    ],
+    {
+      enabled: false,
+    }
+  );
 
   const shouldDisable = useMemo(() => {
     return (
       messageContent.trim().length === 0 ||
       isAfter(user?.canSendMessageTimestamp as Date, new Date())
     );
-  }, [messageContent]);
+  }, [messageContent, user?.canSendMessageTimestamp]);
 
   const handleClick = useCallback(async () => {
     const newDate = new Date();
@@ -42,6 +54,9 @@ export const SendMessageButton: FC = () => {
       id: user?.id as string,
       canSendMessageTimestamp: newDate.toISOString(),
     });
+
+    const newUserData = await findUserQuery.refetch();
+    setUser(newUserData.data?.user as User);
 
     showNotification({
       title: 'Nice',
