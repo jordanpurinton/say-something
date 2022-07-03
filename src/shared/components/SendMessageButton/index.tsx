@@ -48,6 +48,8 @@ export const SendMessageButton: FC = () => {
       content: messageContent,
       userId: user?.id as string,
       nickname: nickname || DEFAULT_NICKNAME,
+      canSendMessageTimestamp:
+        user?.canSendMessageTimestamp.toISOString() as string,
     });
 
     await updateCanSendMessageTimestampMutation.mutateAsync({

@@ -1,3 +1,4 @@
+import * as trpc from '@trpc/server';
 import { z } from 'zod';
 import { prisma } from '../db/prisma';
 import { createRouter } from './context';
@@ -8,8 +9,17 @@ export const messageRouter = createRouter()
       content: z.string(),
       userId: z.string(),
       nickname: z.string(),
+      canSendMessageTimestamp: z.string(),
     }),
     async resolve({ input }) {
+      const canSendMessageTimestamp = new Date(input.canSendMessageTimestamp);
+      if (canSendMessageTimestamp > new Date()) {
+        throw new trpc.TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'canSendMessageTimestamp must be in the past',
+        });
+      }
+
       await prisma.message.create({ data: { ...input } });
     },
   })
@@ -27,7 +37,18 @@ export const messageRouter = createRouter()
     },
   })
   .query('get-random', {
-    async resolve() {
+    input: z.object({
+      canViewMessageTimestamp: z.string(),
+    }),
+    async resolve({ input }) {
+      const canViewMessageTimestamp = new Date(input.canViewMessageTimestamp);
+      if (canViewMessageTimestamp > new Date()) {
+        throw new trpc.TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'canViewMessageTimestamp must be in the past',
+        });
+      }
+
       const count = await prisma.message.count();
       const id = Math.floor(Math.random() * count) + 1;
 
@@ -55,7 +76,10 @@ export const messageRouter = createRouter()
       });
 
       if (!message) {
-        return { success: false, message: 'Message not found' };
+        throw new trpc.TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Message not found',
+        });
       }
 
       await prisma.message.update({
@@ -80,7 +104,10 @@ export const messageRouter = createRouter()
       });
 
       if (!message) {
-        return { success: false, message: 'Message not found' };
+        throw new trpc.TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Message not found',
+        });
       }
 
       await prisma.message.update({
@@ -105,7 +132,10 @@ export const messageRouter = createRouter()
       });
 
       if (!message) {
-        return { success: false, message: 'Message not found' };
+        throw new trpc.TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Message not found',
+        });
       }
 
       await prisma.message.update({

@@ -1,4 +1,5 @@
 import { Button } from '@mantine/core';
+import { Message } from '@prisma/client';
 import { isAfter } from 'date-fns';
 import { FC, useCallback, useMemo } from 'react';
 import { ArrowsShuffle } from 'tabler-icons-react';
@@ -11,9 +12,18 @@ export const ViewMessageButton: FC = () => {
   const { viewMessageModalIsOpen, setViewMessageModalIsOpen } =
     useViewMessageModalIsOpen();
 
-  const { data, refetch, isFetching } = trpc.useQuery(['message.get-random'], {
-    enabled: false,
-  });
+  const { data, refetch, isFetching } = trpc.useQuery(
+    [
+      'message.get-random',
+      {
+        canViewMessageTimestamp:
+          user?.canViewMessageTimestamp.toISOString() as string,
+      },
+    ],
+    {
+      enabled: false,
+    }
+  );
 
   const shouldDisable = useMemo(() => {
     return isAfter(user?.canViewMessageTimestamp as Date, new Date());
@@ -38,7 +48,7 @@ export const ViewMessageButton: FC = () => {
         View Message
       </Button>
       {viewMessageModalIsOpen && (
-        <ViewMessageModal randomMessage={data?.message} />
+        <ViewMessageModal randomMessage={data?.message as Message} />
       )}
     </>
   );
