@@ -10,7 +10,9 @@ export const MessageInput: FC = () => {
   return (
     <Textarea
       className={styles.messageInput}
-      onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setMessageContent(e.target.value)}
+      onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
+        setMessageContent(e.target.value)
+      }
       label={`Message: (${messageContent.length} / ${MAX_MESSAGE_LENGTH})`}
       maxLength={MAX_MESSAGE_LENGTH}
       required

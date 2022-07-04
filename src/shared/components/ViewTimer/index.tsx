@@ -6,7 +6,7 @@ import { useCountdown } from '../../hooks/useCountdown';
 export const SendTimer: FC = () => {
   const { user } = useUser();
   const { hours, minutes, seconds } = useCountdown(
-    new Date(user?.canViewMessageTimestamp?.toString() as string),
+    new Date(user?.canViewMessageTimestamp?.toString() as string)
   );
 
   const ENABLED_TEXT = 'You have a pending message available to view.';
@@ -15,7 +15,7 @@ export const SendTimer: FC = () => {
 
   const isDisabled = useMemo(
     () => Number(hours) > 0 || Number(minutes) > 0 || Number(seconds) > 0,
-    [hours, minutes, seconds],
+    [hours, minutes, seconds]
   );
 
   return (

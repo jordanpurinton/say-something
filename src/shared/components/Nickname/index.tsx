@@ -10,7 +10,9 @@ export const Nickname: FC = () => {
       maxLength={NICKNAME_MAX_LENGTH}
       value={nickname}
       label={`Nickname: (${nickname.length} / ${NICKNAME_MAX_LENGTH})`}
-      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNickname(e.target.value)}
+      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+        setNickname(e.target.value)
+      }
       placeholder={`Defaults to ${DEFAULT_NICKNAME}`}
     />
   );

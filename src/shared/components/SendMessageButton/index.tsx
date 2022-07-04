@@ -16,7 +16,7 @@ export const SendMessageButton: FC = () => {
 
   const createMessageMutation = trpc.useMutation('message.create');
   const updateCanSendMessageTimestampMutation = trpc.useMutation(
-    'user.update-can-send-message-timestamp',
+    'user.update-can-send-message-timestamp'
   );
   const findUserQuery = trpc.useQuery(
     [
@@ -27,13 +27,14 @@ export const SendMessageButton: FC = () => {
     ],
     {
       enabled: false,
-    },
+    }
   );
 
   const shouldDisable = useMemo(
-    () => messageContent.trim().length === 0
-      || isAfter(user?.canSendMessageTimestamp as Date, new Date()),
-    [user, messageContent],
+    () =>
+      messageContent.trim().length === 0 ||
+      isAfter(user?.canSendMessageTimestamp as Date, new Date()),
+    [user, messageContent]
   );
 
   const handleClick = useCallback(async () => {

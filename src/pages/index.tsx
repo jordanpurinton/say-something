@@ -69,14 +69,14 @@ const Index: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
 
 export async function getServerSideProps(context: {
   req:
-  | NextApiRequest
-  | (IncomingMessage & { cookies: Partial<{ [key: string]: string }> });
+    | NextApiRequest
+    | (IncomingMessage & { cookies: Partial<{ [key: string]: string }> });
   res: ServerResponse | NextApiResponse<any>;
 }) {
   const data = await unstable_getServerSession(
     context.req,
     context.res,
-    authOptions,
+    authOptions
   );
 
   if (!data?.token) {
