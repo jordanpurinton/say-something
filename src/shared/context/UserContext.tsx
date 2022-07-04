@@ -1,0 +1,39 @@
+import { User } from '@prisma/client';
+import {
+  createContext,
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useState,
+} from 'react';
+
+interface AppState {
+  user: User | undefined;
+  setUser: Dispatch<SetStateAction<User | undefined>>;
+}
+
+const UserContext = createContext<AppState>({
+  user: undefined,
+  setUser: () => {},
+});
+
+export const UserProvider = (props: any) => {
+  const { children } = props;
+  const [user, setUser] = useState<User | undefined>(undefined);
+
+  return (
+    <UserContext.Provider
+      value={{
+        user,
+        setUser,
+      }}
+    >
+      {children}
+    </UserContext.Provider>
+  );
+};
+
+export const useUser = () => {
+  const { user, setUser } = useContext(UserContext);
+  return { user, setUser };
+};

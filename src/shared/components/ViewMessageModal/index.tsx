@@ -3,7 +3,8 @@ import { Message, User } from '@prisma/client';
 import React, { FC, useCallback, useEffect } from 'react';
 import { ThumbDown, ThumbUp } from 'tabler-icons-react';
 import { Vote, VoteChoice } from '../../constants';
-import { useUser, useViewMessageModalIsOpen } from '../../context/AppContext';
+import { useViewMessageModalIsOpen } from '../../context/AppContext';
+import { useUser } from '../../context/UserContext';
 import styles from '../../styles/ViewMessageModal.module.scss';
 import { trpc } from '../../utils/trpc';
 

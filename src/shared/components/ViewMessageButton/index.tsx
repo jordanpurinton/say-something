@@ -3,7 +3,8 @@ import { Message } from '@prisma/client';
 import { isAfter } from 'date-fns';
 import { FC, useCallback, useMemo } from 'react';
 import { ArrowsShuffle } from 'tabler-icons-react';
-import { useUser, useViewMessageModalIsOpen } from '../../context/AppContext';
+import { useViewMessageModalIsOpen } from '../../context/AppContext';
+import { useUser } from '../../context/UserContext';
 import { trpc } from '../../utils/trpc';
 import { ViewMessageModal } from '../ViewMessageModal';
 

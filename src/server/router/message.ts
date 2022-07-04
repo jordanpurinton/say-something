@@ -12,7 +12,9 @@ export const messageRouter = createRouter()
       canSendMessageTimestamp: z.string(),
     }),
     async resolve({ input }) {
+      const { content, userId, nickname } = input;
       const canSendMessageTimestamp = new Date(input.canSendMessageTimestamp);
+
       if (canSendMessageTimestamp > new Date()) {
         throw new trpc.TRPCError({
           code: 'BAD_REQUEST',
@@ -20,7 +22,7 @@ export const messageRouter = createRouter()
         });
       }
 
-      await prisma.message.create({ data: { ...input } });
+      await prisma.message.create({ data: { content, userId, nickname } });
     },
   })
   .query('find', {
@@ -34,6 +36,27 @@ export const messageRouter = createRouter()
         },
       });
       return { success: true, message };
+    },
+  })
+  .query('find-by-user', {
+    input: z.object({
+      userId: z.string(),
+    }),
+    async resolve({ input }) {
+      const messages = await prisma.message.findMany({
+        where: {
+          userId: input.userId,
+        },
+      });
+
+      if (messages.length === 0) {
+        throw new trpc.TRPCError({
+          code: 'NOT_FOUND',
+          message: `No messages found for user with id: ${input.userId}`,
+        });
+      }
+
+      return { success: true, messages };
     },
   })
   .query('get-random', {
