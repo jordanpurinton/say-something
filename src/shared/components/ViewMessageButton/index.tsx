@@ -42,7 +42,7 @@ export const ViewMessageButton: FC = () => {
         onClick={handleClick}
         rightIcon={<ArrowsShuffle />}
         loading={isFetching}
-        // disabled={shouldDisable}
+        disabled={shouldDisable}
         loaderPosition="right"
         size="md"
         variant="light"
