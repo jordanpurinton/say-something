@@ -5,7 +5,7 @@ import { unstable_getServerSession } from 'next-auth';
 import Head from 'next/head';
 import React, { useEffect } from 'react';
 import superjson from 'superjson';
-import { IncomingMessage, ServerResponse } from 'http';
+import { ServerResponse } from 'http';
 import { useSession } from 'next-auth/react';
 import Greeting from '../shared/components/Greeting';
 import MessageInput from '../shared/components/MessageInput';
