@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/indent */
 import { Center, Space, Text } from '@mantine/core';
 import { User } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse, NextPage } from 'next';
@@ -69,9 +68,7 @@ const Index: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
 };
 
 export async function getServerSideProps(context: {
-  req:
-    | NextApiRequest
-    | (IncomingMessage & { cookies: Partial<{ [key: string]: string }> });
+  req: NextApiRequest;
   res: ServerResponse | NextApiResponse<any>;
 }) {
   const data = await unstable_getServerSession(
