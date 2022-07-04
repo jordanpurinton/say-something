@@ -2,10 +2,12 @@ import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import NextAuth from 'next-auth';
 import Auth0Provider from 'next-auth/providers/auth0';
 import { prisma } from '../../../server/db/prisma';
+import jwtEncode from 'jwt-encode';
 
 export default NextAuth({
   session: {
     strategy: 'jwt',
+    maxAge: 60 * 60 * 24,
   },
   adapter: PrismaAdapter(prisma),
   providers: [
@@ -19,8 +21,15 @@ export default NextAuth({
     async session({ session, token }) {
       return {
         ...session,
+        accessToken: jwtEncode(token, process.env.NEXTAUTH_SECRET as string),
         userId: token.sub,
       };
     },
+    async jwt({ token }) {
+      return token;
+    },
+  },
+  theme: {
+    colorScheme: 'light',
   },
 });

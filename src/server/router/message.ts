@@ -36,6 +36,27 @@ export const messageRouter = createRouter()
       return { success: true, message };
     },
   })
+  .query('find-by-user', {
+    input: z.object({
+      userId: z.string(),
+    }),
+    async resolve({ input }) {
+      const messages = await prisma.message.findMany({
+        where: {
+          userId: input.userId,
+        },
+      });
+
+      if (messages.length === 0) {
+        throw new trpc.TRPCError({
+          code: 'NOT_FOUND',
+          message: `No messages found for user with id: ${input.userId}`,
+        });
+      }
+
+      return { success: true, messages };
+    },
+  })
   .query('get-random', {
     input: z.object({
       canViewMessageTimestamp: z.string(),

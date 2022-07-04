@@ -14,31 +14,11 @@ import HomeContainer from '../shared/containers/HomeContainer';
 import { useUser } from '../shared/context/AppContext';
 import styles from '../shared/styles/Index.module.scss';
 import { trpc } from '../shared/utils/trpc';
+import { setCookie } from 'cookies-next';
 
-const Index: NextPage = () => {
+const Index: NextPage<{ userData: User }> = ({ userData }) => {
   const { data } = useSession();
   const { user, setUser } = useUser();
-
-  const findUserQuery = trpc.useQuery(
-    [
-      'user.find',
-      {
-        id: data?.userId as string,
-      },
-    ],
-    {
-      enabled: !!data,
-    }
-  );
-
-  useEffect(() => {
-    const fetchUserWithData = async () => {
-      if (!data) return;
-      const userData = await findUserQuery.refetch();
-      setUser(userData.data?.user as User);
-    };
-    fetchUserWithData();
-  }, [data]);
 
   return (
     <>
@@ -72,6 +52,24 @@ const Index: NextPage = () => {
       )}
     </>
   );
+};
+
+Index.getInitialProps = async (ctx) => {
+  
+  const findUserQuery = trpc.useQuery(
+    [
+      'user.find',
+      {
+        id: data?.userId as string,
+      },
+    ],
+    {
+      enabled: !!data,
+    }
+  );
+
+  const userData = await findUserQuery.refetch();
+  return { user: userData.data?.user };
 };
 
 export default Index;
