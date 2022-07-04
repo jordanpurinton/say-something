@@ -9,7 +9,7 @@ import styles from '../../styles/ViewMessageModal.module.scss';
 import { trpc } from '../../utils/trpc';
 
 interface Props {
-  randomMessage: Message | undefined;
+  randomMessage: Message;
 }
 
 export const ViewMessageModal: FC<Props> = ({ randomMessage }) => {
@@ -17,22 +17,10 @@ export const ViewMessageModal: FC<Props> = ({ randomMessage }) => {
   const { viewMessageModalIsOpen, setViewMessageModalIsOpen } =
     useViewMessageModalIsOpen();
 
-  const [modalData, setModalData] = React.useState<Message | undefined>(
-    randomMessage
-  );
+  const [modalData, setModalData] = React.useState<Message>(randomMessage);
   const [didVote, setDidVote] = React.useState(false);
-  const [voteChoice, setVoteChoice] = React.useState<VoteChoice>();
-
-  const { refetch } = trpc.useQuery(
-    [
-      'message.find',
-      {
-        id: modalData?.id as number,
-      },
-    ],
-    {
-      enabled: false,
-    }
+  const [voteChoice, setVoteChoice] = React.useState<VoteChoice | undefined>(
+    undefined
   );
 
   const downvoteMessageMutation = trpc.useMutation('message.downvote-message');
@@ -55,6 +43,7 @@ export const ViewMessageModal: FC<Props> = ({ randomMessage }) => {
 
   const handleClose = useCallback(async () => {
     setViewMessageModalIsOpen((prev) => !prev);
+    updateViewsMutation.mutateAsync({ id: modalData.id });
     if (modalData && voteChoice) {
       voteChoice === Vote.down
         ? await downvoteMessageMutation.mutateAsync({ id: modalData.id })
@@ -64,32 +53,45 @@ export const ViewMessageModal: FC<Props> = ({ randomMessage }) => {
     downvoteMessageMutation,
     modalData,
     setViewMessageModalIsOpen,
+    updateViewsMutation,
     upvoteMessageMutation,
     voteChoice,
   ]);
 
   const handleOptimisticUpdate = useCallback(
-    async (type: VoteChoice) => {
-      if (didVote && type === voteChoice) return;
+    async (newVoteChoice: VoteChoice) => {
+      let newMessageData: Message = { ...modalData };
+      const isSameVoteChoice = newVoteChoice === voteChoice;
+      const otherVoteChoice = newVoteChoice === Vote.up ? Vote.down : Vote.up;
 
-      if (modalData) {
-        const otherType: VoteChoice = type === Vote.down ? Vote.up : Vote.down;
-        const newValue =
-          type === Vote.down ? modalData.downvotes + 1 : modalData.upvotes + 1;
+      // @ts-ignore
+      const currentValue = newMessageData[newVoteChoice as string];
+      // @ts-ignore
+      const otherCurrentValue = newMessageData[otherVoteChoice as string];
 
-        const newMessageData = {
-          ...modalData,
-          [type as string]: newValue,
+      if (didVote && isSameVoteChoice) {
+        newMessageData = {
+          ...newMessageData,
+          [newVoteChoice as string]: currentValue - 1,
         };
-
-        if (didVote && newMessageData[otherType] > 0) {
-          newMessageData[otherType] -= 1;
-        }
-
-        setModalData(newMessageData as Message);
-        setVoteChoice(type as VoteChoice);
-        setDidVote(true);
+      } else if (didVote && !isSameVoteChoice) {
+        newMessageData = {
+          ...newMessageData,
+          [newVoteChoice as string]: currentValue + 1,
+          [otherVoteChoice as string]: otherCurrentValue - 1,
+        };
+      } else if (!didVote) {
+        newMessageData = {
+          ...newMessageData,
+          [newVoteChoice as string]: currentValue + 1,
+        };
       }
+
+      setModalData(newMessageData);
+      setDidVote(newVoteChoice !== voteChoice);
+      setVoteChoice((prev) =>
+        prev === newVoteChoice ? undefined : newVoteChoice
+      );
     },
     [didVote, modalData, voteChoice]
   );
@@ -98,13 +100,6 @@ export const ViewMessageModal: FC<Props> = ({ randomMessage }) => {
     const newDate = new Date();
     newDate.setDate(newDate.getDate() + 1);
 
-    const updateViews = async () => {
-      if (modalData) {
-        await updateViewsMutation.mutateAsync({ id: modalData.id });
-        const res = await refetch();
-        setModalData(res.data?.message as Message);
-      }
-    };
     const updateUser = async () => {
       await updateCanViewMessageTimestampMutation.mutateAsync({
         id: user?.id as string,
@@ -114,8 +109,11 @@ export const ViewMessageModal: FC<Props> = ({ randomMessage }) => {
       setUser(newUserData.data?.user as User);
     };
 
-    updateViews();
     updateUser();
+    setModalData({
+      ...modalData,
+      views: modalData.views + 1,
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
