@@ -12,7 +12,9 @@ export const messageRouter = createRouter()
       canSendMessageTimestamp: z.string(),
     }),
     async resolve({ input }) {
+      const { content, userId, nickname } = input;
       const canSendMessageTimestamp = new Date(input.canSendMessageTimestamp);
+
       if (canSendMessageTimestamp > new Date()) {
         throw new trpc.TRPCError({
           code: 'BAD_REQUEST',
@@ -20,7 +22,7 @@ export const messageRouter = createRouter()
         });
       }
 
-      await prisma.message.create({ data: { ...input } });
+      await prisma.message.create({ data: { content, userId, nickname } });
     },
   })
   .query('find', {

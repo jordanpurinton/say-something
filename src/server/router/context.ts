@@ -1,16 +1,14 @@
-// src/server/router/context.ts
 import * as trpc from '@trpc/server';
 import * as trpcNext from '@trpc/server/adapters/next';
-import { unstable_getServerSession } from 'next-auth';
-import { getToken } from 'next-auth/jwt';
 import { prisma } from '../db/prisma';
-import authOptions from '../../pages/api/auth/[...nextauth]';
+import { verifyToken } from '../utils';
 
 export const createContext = async ({
   req,
   res,
 }: trpcNext.CreateNextContextOptions) => {
-  console.log(req.headers);
+  verifyToken(req);
+
   return {
     req,
     res,

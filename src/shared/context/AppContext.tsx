@@ -1,4 +1,3 @@
-import { User } from '@prisma/client';
 import {
   createContext,
   Dispatch,
@@ -14,8 +13,6 @@ interface AppState {
   setNickname: Dispatch<SetStateAction<string>>;
   viewMessageModalIsOpen: boolean;
   setViewMessageModalIsOpen: Dispatch<SetStateAction<boolean>>;
-  user: User | undefined;
-  setUser: Dispatch<SetStateAction<User | undefined>>;
 }
 
 const AppContext = createContext<AppState>({
@@ -25,8 +22,6 @@ const AppContext = createContext<AppState>({
   setNickname: () => {},
   viewMessageModalIsOpen: false,
   setViewMessageModalIsOpen: () => {},
-  user: undefined,
-  setUser: () => {},
 });
 
 export const AppProvider = (props: any) => {
@@ -35,7 +30,6 @@ export const AppProvider = (props: any) => {
   const [nickname, setNickname] = useState<string>('');
   const [viewMessageModalIsOpen, setViewMessageModalIsOpen] =
     useState<boolean>(false);
-  const [user, setUser] = useState<User | undefined>(undefined);
 
   return (
     <AppContext.Provider
@@ -46,8 +40,6 @@ export const AppProvider = (props: any) => {
         setNickname,
         viewMessageModalIsOpen,
         setViewMessageModalIsOpen,
-        user,
-        setUser,
       }}
     >
       {children}
@@ -69,9 +61,4 @@ export const useViewMessageModalIsOpen = () => {
   const { viewMessageModalIsOpen, setViewMessageModalIsOpen } =
     useContext(AppContext);
   return { viewMessageModalIsOpen, setViewMessageModalIsOpen };
-};
-
-export const useUser = () => {
-  const { user, setUser } = useContext(AppContext);
-  return { user, setUser };
 };
