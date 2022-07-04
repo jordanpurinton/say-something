@@ -5,11 +5,8 @@ import { isAfter } from 'date-fns';
 import { FC, useCallback, useMemo } from 'react';
 import { Message } from 'tabler-icons-react';
 import { DEFAULT_NICKNAME } from '../../constants';
-import {
-  useMessageContent,
-  useNickname,
-  useUser,
-} from '../../context/AppContext';
+import { useMessageContent, useNickname } from '../../context/AppContext';
+import { useUser } from '../../context/UserContext';
 import { trpc } from '../../utils/trpc';
 
 export const SendMessageButton: FC = () => {

@@ -7,7 +7,7 @@ import Head from 'next/head';
 import superjson from 'superjson';
 import { AppRouter } from '../server/router';
 import Header from '../shared/components/Header';
-import { AppProvider } from '../shared/context/AppContext';
+import { UserProvider } from '../shared/context/UserContext';
 import '../shared/styles/globals.css';
 
 const App: AppType = ({ Component, pageProps: { session, ...pageProps } }) => {
@@ -30,13 +30,13 @@ const App: AppType = ({ Component, pageProps: { session, ...pageProps } }) => {
         }}
       >
         <SessionProvider session={session}>
-          <AppProvider>
+          <UserProvider>
             <NotificationsProvider>
               <AppShell padding="md" header={<Header />}>
                 <Component {...pageProps} />
               </AppShell>
             </NotificationsProvider>
-          </AppProvider>
+          </UserProvider>
         </SessionProvider>
       </MantineProvider>
     </>
@@ -62,5 +62,5 @@ export default withTRPC<AppRouter>({
       transformer: superjson,
     };
   },
-  ssr: false,
+  ssr: true,
 })(App);

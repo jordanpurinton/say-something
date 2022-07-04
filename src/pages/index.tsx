@@ -1,77 +1,94 @@
 import { Center, Space, Text } from '@mantine/core';
 import { User } from '@prisma/client';
-import type { NextPage } from 'next';
-import { useSession } from 'next-auth/react';
+import type { NextApiRequest, NextApiResponse, NextPage } from 'next';
+import { unstable_getServerSession } from 'next-auth';
 import Head from 'next/head';
 import { useEffect } from 'react';
 import Greeting from '../shared/components/Greeting';
 import MessageInput from '../shared/components/MessageInput';
 import Nickname from '../shared/components/Nickname';
 import SendMessageButton from '../shared/components/SendMessageButton';
-import Timer from '../shared/components/Timer';
+import SendTimer from '../shared/components/SendTimer';
 import ViewMessageButton from '../shared/components/ViewMessageButton';
 import HomeContainer from '../shared/containers/HomeContainer';
-import { useUser } from '../shared/context/AppContext';
+import { AppProvider } from '../shared/context/AppContext';
 import styles from '../shared/styles/Index.module.scss';
-import { trpc } from '../shared/utils/trpc';
+import { authOptions } from '../pages/api/auth/[...nextauth]';
+import superjson from 'superjson';
+import { IncomingMessage, ServerResponse } from 'http';
+import { SerializedUser } from '../shared/types';
+import { setInitUser } from '../shared/utils/user';
+import { useSession } from 'next-auth/react';
+import ViewTimer from '../shared/components/ViewTimer';
+import { useUser } from '../shared/context/UserContext';
 
-const Index: NextPage = () => {
+const Index: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
   const { data } = useSession();
   const { user, setUser } = useUser();
 
-  const findUserQuery = trpc.useQuery(
-    [
-      'user.find',
-      {
-        id: data?.userId as string,
-      },
-    ],
-    {
-      enabled: !!data,
-    }
-  );
-
   useEffect(() => {
-    const fetchUserWithData = async () => {
-      if (!data) return;
-      const userData = await findUserQuery.refetch();
-      setUser(userData.data?.user as User);
-    };
-    fetchUserWithData();
-  }, [data]);
+    setUser(setInitUser(userData));
+  }, []);
+
+  if (!data || !user) {
+    return (
+      <Center>
+        <Text>Loading...</Text>
+      </Center>
+    );
+  }
 
   return (
     <>
-      {user ? (
-        <>
-          <Head>
-            <title>Say Something</title>
-            <link rel="icon" href="/favicon.ico" />
-          </Head>
-          <main>
-            <HomeContainer>
-              <Greeting />
-              <Space h="md" />
-              <Nickname />
-              <Space h="md" />
-              <MessageInput />
-              <Space h="md" />
-              <span className={styles.buttonControls}>
-                <SendMessageButton />
-                <ViewMessageButton />
-              </span>
-              <Timer type="send" dateToCompare={user.canSendMessageTimestamp} />
-              <Timer type="view" dateToCompare={user.canViewMessageTimestamp} />
-            </HomeContainer>
-          </main>
-        </>
-      ) : (
-        <Center>
-          <Text>Loading...</Text>
-        </Center>
-      )}
+      <Head>
+        <title>Say Something</title>
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+      <main>
+        <AppProvider>
+          <HomeContainer>
+            <Greeting />
+            <Space h="md" />
+            <Nickname />
+            <Space h="md" />
+            <MessageInput />
+            <Space h="md" />
+            <span className={styles.buttonControls}>
+              <SendMessageButton />
+              <ViewMessageButton />
+            </span>
+            <SendTimer />
+            <ViewTimer />
+          </HomeContainer>
+        </AppProvider>
+      </main>
     </>
   );
 };
+
+export async function getServerSideProps(context: {
+  req:
+    | NextApiRequest
+    | (IncomingMessage & { cookies: Partial<{ [key: string]: string }> });
+  res: ServerResponse | NextApiResponse<any>;
+}) {
+  const data = await unstable_getServerSession(
+    context.req,
+    context.res,
+    authOptions
+  );
+
+  if (!data?.token) {
+    context.res.writeHead(302, { Location: '/oops' });
+  }
+
+  context.res.setHeader('Set-Cookie', [
+    `access_token=${data?.token as string}`,
+  ]);
+
+  return {
+    props: { userData: superjson.serialize(data?.userProfile as User).json },
+  };
+}
 
 export default Index;
