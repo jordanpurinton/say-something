@@ -1,6 +1,6 @@
 import { Avatar as MantineAvatar } from '@mantine/core';
 import { useSession } from 'next-auth/react';
-import { FC } from 'react';
+import React, { FC } from 'react';
 import styles from '../../styles/Avatar.module.scss';
 
 export const Avatar: FC = () => {

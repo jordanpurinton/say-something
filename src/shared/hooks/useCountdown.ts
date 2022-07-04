@@ -3,27 +3,8 @@ import { useEffect, useState } from 'react';
 // https://blog.greenroots.info/how-to-create-a-countdown-timer-using-react-hooks
 
 // function that pads a number with a leading zero
-const padWithZero = (value: number): string => {
-  return value < 10 ? `0${value}` : value.toString();
-};
-
-const useCountdown = (targetDate: Date) => {
-  const countDownDate = new Date(targetDate).getTime();
-
-  const [countDown, setCountDown] = useState(
-    countDownDate - new Date().getTime()
-  );
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCountDown(countDownDate - new Date().getTime());
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [countDownDate]);
-
-  return getReturnValues(countDown);
-};
+const padWithZero = (value: number): string =>
+  value < 10 ? `0${value}` : value.toString();
 
 const getReturnValues = (
   countDown: number
@@ -44,3 +25,21 @@ const getReturnValues = (
 };
 
 export { useCountdown };
+
+const useCountdown = (targetDate: Date) => {
+  const countDownDate = new Date(targetDate).getTime();
+
+  const [countDown, setCountDown] = useState(
+    countDownDate - new Date().getTime()
+  );
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCountDown(countDownDate - new Date().getTime());
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [countDownDate]);
+
+  return getReturnValues(countDown);
+};

@@ -1,9 +1,10 @@
 import { User } from '@prisma/client';
-import {
+import React, {
   createContext,
   Dispatch,
   SetStateAction,
   useContext,
+  useMemo,
   useState,
 } from 'react';
 
@@ -21,13 +22,13 @@ export const UserProvider = (props: any) => {
   const { children } = props;
   const [user, setUser] = useState<User | undefined>(undefined);
 
+  const memoizedProviderValues = useMemo(
+    () => ({ user, setUser }),
+    [user, setUser]
+  );
+
   return (
-    <UserContext.Provider
-      value={{
-        user,
-        setUser,
-      }}
-    >
+    <UserContext.Provider value={memoizedProviderValues}>
       {children}
     </UserContext.Provider>
   );

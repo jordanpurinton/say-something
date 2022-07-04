@@ -1,3 +1,4 @@
+import React from 'react';
 import { createStylesServer, ServerStyles } from '@mantine/next';
 import Document, {
   DocumentContext,
@@ -9,6 +10,7 @@ import Document, {
 
 const stylesServer = createStylesServer();
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export default class _Document extends Document {
   static async getInitialProps(ctx: DocumentContext) {
     const initialProps = await Document.getInitialProps(ctx);

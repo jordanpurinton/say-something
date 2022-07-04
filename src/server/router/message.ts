@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { prisma } from '../db/prisma';
 import { createRouter } from './context';
 
-export const messageRouter = createRouter()
+export default createRouter()
   .mutation('create', {
     input: z.object({
       content: z.string(),

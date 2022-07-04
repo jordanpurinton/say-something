@@ -2,18 +2,29 @@
   "root": true,
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "jsx": true,
-    "useJSXTextNode": true
+    "project": ["./tsconfig.json"]
   },
-  "extends": [
-    "next/core-web-vitals",
-    "plugin:prettier/recommended",
-    "prettier",
-    "airbnb"
-  ],
+  "extends": ["next/core-web-vitals", "prettier", "airbnb-typescript"],
   "rules": {
     "react-hooks/rules-of-hooks": "error",
-    "react-hooks/exhaustive-deps": "error"
+    "react-hooks/exhaustive-deps": "error",
+    "react/function-component-definition": [
+      2,
+      {
+        "namedComponents": "arrow-function",
+        "unnamedComponents": "arrow-function"
+      }
+    ],
+    "@typescript-eslint/comma-dangle": "off",
+    "@typescript-eslint/no-unused-expressions": [
+      "error",
+      { "allowTernary": true }
+    ],
+    "operator-linebreak": "off",
+    "import/prefer-default-export": "off",
+    "import/no-named-as-default": "off",
+    "react/prop-types": "off"
   },
-  "plugins": ["@typescript-eslint"]
+  "plugins": ["@typescript-eslint"],
+  "ignorePatterns": ["/*.*"]
 }

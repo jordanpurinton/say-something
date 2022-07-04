@@ -1,7 +1,7 @@
 import { Button } from '@mantine/core';
 import { Message } from '@prisma/client';
 import { isAfter } from 'date-fns';
-import { FC, useCallback, useMemo } from 'react';
+import React, { FC, useCallback, useMemo } from 'react';
 import { ArrowsShuffle } from 'tabler-icons-react';
 import { useViewMessageModalIsOpen } from '../../context/AppContext';
 import { useUser } from '../../context/UserContext';
@@ -26,9 +26,10 @@ export const ViewMessageButton: FC = () => {
     }
   );
 
-  const shouldDisable = useMemo(() => {
-    return isAfter(user?.canViewMessageTimestamp as Date, new Date());
-  }, [user]);
+  const shouldDisable = useMemo(
+    () => isAfter(user?.canViewMessageTimestamp as Date, new Date()),
+    [user]
+  );
 
   const handleClick = useCallback(async () => {
     await refetch();
@@ -41,7 +42,7 @@ export const ViewMessageButton: FC = () => {
         onClick={handleClick}
         rightIcon={<ArrowsShuffle />}
         loading={isFetching}
-        disabled={shouldDisable}
+        // disabled={shouldDisable}
         loaderPosition="right"
         size="md"
         variant="light"

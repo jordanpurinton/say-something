@@ -2,8 +2,8 @@
 import superjson from 'superjson';
 import { createRouter } from './context';
 
-import { messageRouter } from './message';
-import { userRouter } from './user';
+import messageRouter from './message';
+import userRouter from './user';
 
 export const appRouter = createRouter()
   .transformer(superjson)

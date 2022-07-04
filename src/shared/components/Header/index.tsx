@@ -1,6 +1,6 @@
 import { Button, Header as MantineHeader, Title } from '@mantine/core';
 import { useRouter } from 'next/router';
-import { FC } from 'react';
+import React, { FC } from 'react';
 import styles from '../../styles/Header.module.scss';
 import Avatar from '../Avatar';
 

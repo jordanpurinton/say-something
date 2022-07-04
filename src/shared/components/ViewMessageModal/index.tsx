@@ -1,4 +1,6 @@
-import { Button, Modal, Space, Text } from '@mantine/core';
+import {
+  Button, Modal, Space, Text
+} from '@mantine/core';
 import { Message, User } from '@prisma/client';
 import React, { FC, useCallback, useEffect } from 'react';
 import { ThumbDown, ThumbUp } from 'tabler-icons-react';
@@ -64,7 +66,9 @@ export const ViewMessageModal: FC<Props> = ({ randomMessage }) => {
     }
   }, [
     downvoteMessageMutation,
+    findUserQuery,
     modalData,
+    setUser,
     setViewMessageModalIsOpen,
     upvoteMessageMutation,
     voteChoice,
@@ -117,56 +121,66 @@ export const ViewMessageModal: FC<Props> = ({ randomMessage }) => {
   }, []);
 
   return (
-    <>
-      <Modal
-        opened={viewMessageModalIsOpen}
-        onClose={handleClose}
-        title="Viewing Daily Message"
-        centered
-      >
-        <Text size="lg">{modalData?.content}</Text>
-        <Space h="md" />
-        <Text size="sm">{modalData?.views} views</Text>
-        <Space h="md" />
-        <Text size="xs" weight="bold">
-          From {modalData?.nickname}
-        </Text>
-        <Text size="xs" color="dimmed">
-          Sent on {modalData?.createdAt.toDateString()}
-        </Text>
-        <Space h="md" />
-        <div>
-          <Button
-            onClick={() => handleOptimisticUpdate(Vote.down)}
-            rightIcon={
-              <ThumbDown
-                className={voteChoice === Vote.down ? styles.downFilled : ''}
-              />
-            }
-            className={styles.voteButton}
-            loaderPosition="right"
-            variant="light"
-            color="red"
-          >
-            Bad ({modalData?.downvotes})
-          </Button>
-          <Button
-            onClick={() => handleOptimisticUpdate(Vote.up)}
-            rightIcon={
-              <ThumbUp
-                className={voteChoice === Vote.up ? styles.upFilled : ''}
-              />
-            }
-            className={styles.voteButton}
-            loaderPosition="right"
-            variant="light"
-            color="green"
-          >
-            Nice ({modalData?.upvotes})
-          </Button>
-        </div>
-      </Modal>
-    </>
+    <Modal
+      opened={viewMessageModalIsOpen}
+      onClose={handleClose}
+      title="Viewing Daily Message"
+      centered
+    >
+      <Text size="lg">{modalData?.content}</Text>
+      <Space h="md" />
+      <Text size="sm">
+        {modalData?.views}
+        {' '}
+        views
+      </Text>
+      <Space h="md" />
+      <Text size="xs" weight="bold">
+        From
+        {' '}
+        {modalData?.nickname}
+      </Text>
+      <Text size="xs" color="dimmed">
+        Sent on
+        {' '}
+        {modalData?.createdAt.toDateString()}
+      </Text>
+      <Space h="md" />
+      <div>
+        <Button
+          onClick={() => handleOptimisticUpdate(Vote.down)}
+          rightIcon={(
+            <ThumbDown
+              className={voteChoice === Vote.down ? styles.downFilled : ''}
+            />
+          )}
+          className={styles.voteButton}
+          loaderPosition="right"
+          variant="light"
+          color="red"
+        >
+          Bad (
+          {modalData?.downvotes}
+          )
+        </Button>
+        <Button
+          onClick={() => handleOptimisticUpdate(Vote.up)}
+          rightIcon={(
+            <ThumbUp
+              className={voteChoice === Vote.up ? styles.upFilled : ''}
+            />
+          )}
+          className={styles.voteButton}
+          loaderPosition="right"
+          variant="light"
+          color="green"
+        >
+          Nice (
+          {modalData?.upvotes}
+          )
+        </Button>
+      </div>
+    </Modal>
   );
 };
 

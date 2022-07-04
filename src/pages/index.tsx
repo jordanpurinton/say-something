@@ -3,7 +3,10 @@ import { User } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse, NextPage } from 'next';
 import { unstable_getServerSession } from 'next-auth';
 import Head from 'next/head';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
+import superjson from 'superjson';
+import { IncomingMessage, ServerResponse } from 'http';
+import { useSession } from 'next-auth/react';
 import Greeting from '../shared/components/Greeting';
 import MessageInput from '../shared/components/MessageInput';
 import Nickname from '../shared/components/Nickname';
@@ -13,12 +16,9 @@ import ViewMessageButton from '../shared/components/ViewMessageButton';
 import HomeContainer from '../shared/containers/HomeContainer';
 import { AppProvider } from '../shared/context/AppContext';
 import styles from '../shared/styles/Index.module.scss';
-import { authOptions } from '../pages/api/auth/[...nextauth]';
-import superjson from 'superjson';
-import { IncomingMessage, ServerResponse } from 'http';
+import { authOptions } from './api/auth/[...nextauth]';
 import { SerializedUser } from '../shared/types';
 import { setInitUser } from '../shared/utils/user';
-import { useSession } from 'next-auth/react';
 import ViewTimer from '../shared/components/ViewTimer';
 import { useUser } from '../shared/context/UserContext';
 
@@ -28,6 +28,7 @@ const Index: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
 
   useEffect(() => {
     setUser(setInitUser(userData));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (!data || !user) {
@@ -68,14 +69,14 @@ const Index: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
 
 export async function getServerSideProps(context: {
   req:
-    | NextApiRequest
-    | (IncomingMessage & { cookies: Partial<{ [key: string]: string }> });
+  | NextApiRequest
+  | (IncomingMessage & { cookies: Partial<{ [key: string]: string }> });
   res: ServerResponse | NextApiResponse<any>;
 }) {
   const data = await unstable_getServerSession(
     context.req,
     context.res,
-    authOptions
+    authOptions,
   );
 
   if (!data?.token) {

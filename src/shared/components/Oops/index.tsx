@@ -1,6 +1,8 @@
-import { Button, Container, Text, Title } from '@mantine/core';
+import {
+  Button, Container, Text, Title,
+} from '@mantine/core';
 import { useRouter } from 'next/router';
-import { FC } from 'react';
+import React, { FC } from 'react';
 import { ArrowRight } from 'tabler-icons-react';
 
 export const Oops: FC = () => {

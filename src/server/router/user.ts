@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { prisma } from '../db/prisma';
 import { createRouter } from './context';
 
-export const userRouter = createRouter()
+export default createRouter()
   .mutation('create', {
     input: z.object({
       id: z.string(),

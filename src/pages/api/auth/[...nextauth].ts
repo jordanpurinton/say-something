@@ -1,8 +1,8 @@
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import NextAuth, { NextAuthOptions } from 'next-auth';
 import Auth0Provider from 'next-auth/providers/auth0';
-import { prisma } from '../../../server/db/prisma';
 import jwt from 'jsonwebtoken';
+import { prisma } from '../../../server/db/prisma';
 
 const authOptions: NextAuthOptions = {
   session: {

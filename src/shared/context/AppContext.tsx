@@ -1,8 +1,9 @@
-import {
+import React, {
   createContext,
   Dispatch,
   SetStateAction,
   useContext,
+  useMemo,
   useState,
 } from 'react';
 
@@ -31,17 +32,20 @@ export const AppProvider = (props: any) => {
   const [viewMessageModalIsOpen, setViewMessageModalIsOpen] =
     useState<boolean>(false);
 
+  const memoizedProviderValues = useMemo(
+    () => ({
+      messageContent,
+      setMessageContent,
+      nickname,
+      setNickname,
+      viewMessageModalIsOpen,
+      setViewMessageModalIsOpen,
+    }),
+    [messageContent, nickname, viewMessageModalIsOpen]
+  );
+
   return (
-    <AppContext.Provider
-      value={{
-        messageContent,
-        setMessageContent,
-        nickname,
-        setNickname,
-        viewMessageModalIsOpen,
-        setViewMessageModalIsOpen,
-      }}
-    >
+    <AppContext.Provider value={memoizedProviderValues}>
       {children}
     </AppContext.Provider>
   );
