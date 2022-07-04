@@ -13,12 +13,11 @@ export const ViewMessageButton: FC = () => {
   const { viewMessageModalIsOpen, setViewMessageModalIsOpen } =
     useViewMessageModalIsOpen();
 
-  const { data, refetch, isFetching } = trpc.useQuery(
+  const { data, refetch, isFetching, isError } = trpc.useQuery(
     [
       'message.get-random',
       {
-        canViewMessageTimestamp:
-          user?.canViewMessageTimestamp.toISOString() as string,
+        userId: user?.id as string,
       },
     ],
     {
@@ -33,8 +32,8 @@ export const ViewMessageButton: FC = () => {
 
   const handleClick = useCallback(async () => {
     await refetch();
-    setViewMessageModalIsOpen((prev) => !prev);
-  }, [refetch, setViewMessageModalIsOpen]);
+    setViewMessageModalIsOpen((prev) => !prev && !isError);
+  }, [isError, refetch, setViewMessageModalIsOpen]);
 
   return (
     <>
@@ -49,7 +48,7 @@ export const ViewMessageButton: FC = () => {
       >
         View Message
       </Button>
-      {viewMessageModalIsOpen && (
+      {viewMessageModalIsOpen && data?.message && (
         <ViewMessageModal randomMessage={data?.message as Message} />
       )}
     </>

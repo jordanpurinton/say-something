@@ -9,13 +9,17 @@ export default createRouter()
       content: z.string(),
       userId: z.string(),
       nickname: z.string(),
-      canSendMessageTimestamp: z.string(),
     }),
     async resolve({ input }) {
       const { content, userId, nickname } = input;
-      const canSendMessageTimestamp = new Date(input.canSendMessageTimestamp);
 
-      if (canSendMessageTimestamp > new Date()) {
+      const user = await prisma.user.findUnique({
+        where: {
+          id: input.userId,
+        },
+      });
+
+      if ((user?.canSendMessageTimestamp as Date) > new Date()) {
         throw new trpc.TRPCError({
           code: 'BAD_REQUEST',
           message: 'canSendMessageTimestamp must be in the past',
@@ -61,11 +65,16 @@ export default createRouter()
   })
   .query('get-random', {
     input: z.object({
-      canViewMessageTimestamp: z.string(),
+      userId: z.string(),
     }),
     async resolve({ input }) {
-      const canViewMessageTimestamp = new Date(input.canViewMessageTimestamp);
-      if (canViewMessageTimestamp > new Date()) {
+      const user = await prisma.user.findUnique({
+        where: {
+          id: input.userId,
+        },
+      });
+
+      if ((user?.canViewMessageTimestamp as Date) > new Date()) {
         throw new trpc.TRPCError({
           code: 'BAD_REQUEST',
           message: 'canViewMessageTimestamp must be in the past',

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/indent */
 import { Center, Space, Text } from '@mantine/core';
 import { User } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse, NextPage } from 'next';

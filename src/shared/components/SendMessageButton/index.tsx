@@ -11,7 +11,7 @@ import { trpc } from '../../utils/trpc';
 
 export const SendMessageButton: FC = () => {
   const { user, setUser } = useUser();
-  const { messageContent } = useMessageContent();
+  const { messageContent, setMessageContent } = useMessageContent();
   const { nickname } = useNickname();
 
   const createMessageMutation = trpc.useMutation('message.create');
@@ -33,8 +33,13 @@ export const SendMessageButton: FC = () => {
   const shouldDisable = useMemo(
     () =>
       messageContent.trim().length === 0 ||
-      isAfter(user?.canSendMessageTimestamp as Date, new Date()),
-    [user, messageContent]
+      isAfter(user?.canSendMessageTimestamp as Date, new Date()) ||
+      updateCanSendMessageTimestampMutation.isLoading,
+    [
+      messageContent,
+      user?.canSendMessageTimestamp,
+      updateCanSendMessageTimestampMutation.isLoading,
+    ]
   );
 
   const handleClick = useCallback(async () => {
@@ -45,8 +50,6 @@ export const SendMessageButton: FC = () => {
       content: messageContent,
       userId: user?.id as string,
       nickname: nickname || DEFAULT_NICKNAME,
-      canSendMessageTimestamp:
-        user?.canSendMessageTimestamp.toISOString() as string,
     });
 
     await updateCanSendMessageTimestampMutation.mutateAsync({
@@ -56,6 +59,7 @@ export const SendMessageButton: FC = () => {
 
     const newUserData = await findUserQuery.refetch();
     setUser(newUserData.data?.user as User);
+    setMessageContent('');
 
     showNotification({
       title: 'Nice',
@@ -65,18 +69,18 @@ export const SendMessageButton: FC = () => {
     createMessageMutation,
     messageContent,
     user?.id,
-    user?.canSendMessageTimestamp,
     nickname,
     updateCanSendMessageTimestampMutation,
     findUserQuery,
     setUser,
+    setMessageContent,
   ]);
 
   return (
     <Button
       disabled={shouldDisable}
       onClick={handleClick}
-      loading={createMessageMutation.isLoading}
+      loading={updateCanSendMessageTimestampMutation.isLoading}
       rightIcon={<Message />}
       variant="gradient"
       gradient={{ from: 'indigo', to: 'cyan' }}

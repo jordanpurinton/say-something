@@ -54,8 +54,6 @@ export const ViewMessageModal: FC<Props> = ({ randomMessage }) => {
   );
 
   const handleClose = useCallback(async () => {
-    const newUserData = await findUserQuery.refetch();
-    setUser(newUserData.data?.user as User);
     setViewMessageModalIsOpen((prev) => !prev);
     if (modalData && voteChoice) {
       voteChoice === Vote.down
@@ -64,9 +62,7 @@ export const ViewMessageModal: FC<Props> = ({ randomMessage }) => {
     }
   }, [
     downvoteMessageMutation,
-    findUserQuery,
     modalData,
-    setUser,
     setViewMessageModalIsOpen,
     upvoteMessageMutation,
     voteChoice,
@@ -109,12 +105,17 @@ export const ViewMessageModal: FC<Props> = ({ randomMessage }) => {
         setModalData(res.data?.message as Message);
       }
     };
-    updateViews();
-    updateCanViewMessageTimestampMutation.mutateAsync({
-      id: user?.id as string,
-      canViewMessageTimestamp: newDate.toISOString(),
-    });
+    const updateUser = async () => {
+      await updateCanViewMessageTimestampMutation.mutateAsync({
+        id: user?.id as string,
+        canViewMessageTimestamp: newDate.toISOString(),
+      });
+      const newUserData = await findUserQuery.refetch();
+      setUser(newUserData.data?.user as User);
+    };
 
+    updateViews();
+    updateUser();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

@@ -1,13 +1,15 @@
 import * as trpc from '@trpc/server';
 import * as trpcNext from '@trpc/server/adapters/next';
+import { JwtPayload } from 'jsonwebtoken';
 import { prisma } from '../db/prisma';
-import { verifyToken } from '../utils';
+import { checkTokenExp, getVerifiedToken } from '../utils';
 
 export const createContext = async ({
   req,
   res,
 }: trpcNext.CreateNextContextOptions) => {
-  verifyToken(req);
+  const verified = getVerifiedToken(req);
+  checkTokenExp(verified as JwtPayload);
 
   return {
     req,

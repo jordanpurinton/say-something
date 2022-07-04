@@ -1,4 +1,4 @@
-import { Container, Space, Text } from '@mantine/core';
+import { Center, Container, Space, Text } from '@mantine/core';
 import React, { FC, useMemo } from 'react';
 import { useUser } from '../../context/UserContext';
 import { useCountdown } from '../../hooks/useCountdown';
@@ -9,10 +9,6 @@ export const SendTimer: FC = () => {
     new Date(user?.canViewMessageTimestamp?.toString() as string)
   );
 
-  const ENABLED_TEXT = 'You have a pending message available to view.';
-
-  const DISABLED_TEXT = `You can view a message in ${hours}:${minutes}:${seconds}`;
-
   const isDisabled = useMemo(
     () => Number(hours) > 0 || Number(minutes) > 0 || Number(seconds) > 0,
     [hours, minutes, seconds]
@@ -21,7 +17,20 @@ export const SendTimer: FC = () => {
   return (
     <Container>
       <Space h="md" />
-      <Text>{isDisabled ? DISABLED_TEXT : ENABLED_TEXT}</Text>
+      <Text>
+        {isDisabled ? (
+          <>
+            You can view a message in <Space h="xs" />
+            <Center>
+              <Text weight="bold">
+                {hours}:{minutes}:{seconds}
+              </Text>
+            </Center>
+          </>
+        ) : (
+          <>You have a pending message available to view.</>
+        )}
+      </Text>
     </Container>
   );
 };
