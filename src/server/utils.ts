@@ -40,7 +40,9 @@ export const throwForbidden = () => {
   });
 };
 
-export const getVerifiedToken = (req: NextApiRequest): JwtPayload | undefined => {
+export const getVerifiedToken = (
+  req: NextApiRequest
+): JwtPayload | undefined => {
   try {
     const verified = jwt.verify(
       req.cookies.access_token || '',
