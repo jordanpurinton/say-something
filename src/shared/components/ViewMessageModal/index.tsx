@@ -1,12 +1,11 @@
-import { Button, Modal, Space, Text } from '@mantine/core';
+import { Modal } from '@mantine/core';
 import { Message, User } from '@prisma/client';
 import React, { FC, useCallback, useEffect } from 'react';
-import { ThumbDown, ThumbUp } from 'tabler-icons-react';
 import { Vote, VoteChoice } from '../../constants';
 import { useViewMessageModalIsOpen } from '../../context/AppContext';
 import { useUser } from '../../context/UserContext';
-import styles from '../../styles/ViewMessageModal.module.scss';
 import { trpc } from '../../utils/trpc';
+import MessageCard from '../MessageCard';
 
 interface Props {
   randomMessage: Message;
@@ -58,7 +57,7 @@ export const ViewMessageModal: FC<Props> = ({ randomMessage }) => {
     voteChoice,
   ]);
 
-  const handleOptimisticUpdate = useCallback(
+  const handleOptimisticVoteUpdate = useCallback(
     async (newVoteChoice: VoteChoice) => {
       let newMessageData: Message = { ...modalData };
       const isSameVoteChoice = newVoteChoice === voteChoice;
@@ -124,47 +123,11 @@ export const ViewMessageModal: FC<Props> = ({ randomMessage }) => {
       title="Viewing Daily Message"
       centered
     >
-      <Text size="lg">{modalData?.content}</Text>
-      <Space h="md" />
-      <Text size="sm">{modalData?.views} views</Text>
-      <Space h="md" />
-      <Text size="xs" weight="bold">
-        From {modalData?.nickname}
-      </Text>
-      <Text size="xs" color="dimmed">
-        Sent on {modalData?.createdAt.toDateString()}
-      </Text>
-      <Space h="md" />
-      <div>
-        <Button
-          onClick={() => handleOptimisticUpdate(Vote.down)}
-          rightIcon={
-            <ThumbDown
-              className={voteChoice === Vote.down ? styles.downFilled : ''}
-            />
-          }
-          className={styles.voteButton}
-          loaderPosition="right"
-          variant="light"
-          color="red"
-        >
-          Bad ({modalData?.downvotes})
-        </Button>
-        <Button
-          onClick={() => handleOptimisticUpdate(Vote.up)}
-          rightIcon={
-            <ThumbUp
-              className={voteChoice === Vote.up ? styles.upFilled : ''}
-            />
-          }
-          className={styles.voteButton}
-          loaderPosition="right"
-          variant="light"
-          color="green"
-        >
-          Nice ({modalData?.upvotes})
-        </Button>
-      </div>
+      <MessageCard
+        message={modalData}
+        voteChoice={voteChoice}
+        handleOptimisticVoteUpdate={handleOptimisticVoteUpdate}
+      />
     </Modal>
   );
 };

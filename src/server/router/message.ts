@@ -1,3 +1,4 @@
+import { Message } from '@prisma/client';
 import { z } from 'zod';
 import { prisma } from '../db/prisma';
 import {
@@ -81,26 +82,40 @@ export default createRouter()
         return throwBadRequest('canViewMessageTimestamp must be in the past');
       }
 
-      const count = await prisma.message.count();
-      const id = Math.floor(Math.random() * count) + 1;
-
-      const message = await prisma.message.findMany({
+      const message = await prisma.message.findFirst({
         where: {
-          id: {
-            equals: id,
+          userId: {
+            not: session?.userProfile.id,
           },
         },
         take: 1,
       });
 
-      return { success: true, message: message[0] };
+      const prevViewedMessageIds = user?.viewedMessageIds.split(',') || [];
+      const newViewedMessageIdsString = [
+        ...prevViewedMessageIds,
+        message?.id || '',
+      ].join(',');
+      await prisma.user.update({
+        where: {
+          id: session?.userProfile.id,
+        },
+        data: {
+          viewedMessageIds: {
+            set: newViewedMessageIdsString,
+          },
+        },
+      });
+
+      return { success: true, message: message };
     },
   })
   .mutation('upvote-message', {
     input: z.object({
       id: z.number(),
     }),
-    async resolve({ input }) {
+    async resolve({ ctx, input }) {
+      const session = await getServerSession(ctx);
       const message = await prisma.message.findUnique({
         where: {
           id: input.id,
@@ -109,6 +124,10 @@ export default createRouter()
 
       if (!message) {
         return throwServerError('Message not found');
+      }
+
+      if (message.userId === session?.userProfile.id) {
+        return throwBadRequest('Cannot upvote your own message');
       }
 
       await prisma.message.update({
@@ -125,7 +144,8 @@ export default createRouter()
     input: z.object({
       id: z.number(),
     }),
-    async resolve({ input }) {
+    async resolve({ ctx, input }) {
+      const session = await getServerSession(ctx);
       const message = await prisma.message.findUnique({
         where: {
           id: input.id,
@@ -134,6 +154,10 @@ export default createRouter()
 
       if (!message) {
         return throwServerError('Message not found');
+      }
+
+      if (message.userId === session?.userProfile.id) {
+        return throwBadRequest('Cannot downvote your own message');
       }
 
       await prisma.message.update({
@@ -169,5 +193,45 @@ export default createRouter()
           views: message.views + 1,
         },
       });
+    },
+  })
+  .query('find-viewed-messages', {
+    async resolve({ ctx }) {
+      const session = await getServerSession(ctx);
+
+      const user = await prisma.user.findUnique({
+        where: {
+          id: session?.userProfile.id,
+        },
+      });
+
+      const viewedMessageIds = Array.from(
+        new Set(
+          user?.viewedMessageIds
+            .split(',')
+            .map((id) => {
+              const parsedId = parseInt(id) || -1;
+              if (isNaN(parsedId)) {
+                return;
+              }
+              if (!isNaN(parsedId) && parsedId > -1) return parsedId;
+            })
+            .filter((id) => !!id)
+        )
+      );
+
+      let messagesToReturn: Message[] = [];
+
+      if (viewedMessageIds.length > 0) {
+        messagesToReturn = await prisma.message.findMany({
+          where: {
+            id: {
+              in: viewedMessageIds as number[],
+            },
+          },
+        });
+      }
+
+      return { success: true, messages: messagesToReturn };
     },
   });

@@ -1,5 +1,5 @@
 import { Center, Space, Text } from '@mantine/core';
-import { User } from '@prisma/client';
+import { Message, User } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse, NextPage } from 'next';
 import { unstable_getServerSession } from 'next-auth';
 import Head from 'next/head';
@@ -7,31 +7,33 @@ import React, { useEffect } from 'react';
 import superjson from 'superjson';
 import { ServerResponse } from 'http';
 import { useSession } from 'next-auth/react';
-import Greeting from '../shared/components/Greeting';
-import MessageInput from '../shared/components/MessageInput';
-import Nickname from '../shared/components/Nickname';
-import SendMessageButton from '../shared/components/SendMessageButton';
-import SendTimer from '../shared/components/SendTimer';
-import ViewMessageButton from '../shared/components/ViewMessageButton';
-import { AppProvider } from '../shared/context/AppContext';
-import styles from '../shared/styles/Index.module.scss';
 import { authOptions } from './api/auth/[...nextauth]';
 import { SerializedUser } from '../shared/types';
-import { setInitUser } from '../shared/utils/user';
-import ViewTimer from '../shared/components/ViewTimer';
 import { useUser } from '../shared/context/UserContext';
+import MessageCard from '../shared/components/MessageCard';
+import { trpc } from '../shared/utils/trpc';
+import { setInitUser } from '../shared/utils/user';
 import PageContainer from '../shared/containers/PageContainer';
 
-const Index: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
+const SendHistory: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
   const { data } = useSession();
   const { user, setUser } = useUser();
+  const [messagesForUser, setMessagesForUser] = React.useState<Message[]>([]);
+  const findMessagesByUserQuery = trpc.useQuery(['message.find-by-user'], {
+    enabled: false,
+  });
 
   useEffect(() => {
     setUser(setInitUser(userData));
+    const fetchMessageData = async () => {
+      const messageData = await findMessagesByUserQuery.refetch();
+      setMessagesForUser(messageData?.data?.messages as Message[]);
+    };
+    fetchMessageData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (!data || !user) {
+  if (!data || !user || findMessagesByUserQuery.isLoading) {
     return (
       <Center>
         <Text>Loading...</Text>
@@ -42,26 +44,18 @@ const Index: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
   return (
     <>
       <Head>
-        <title>Say Something</title>
+        <title>Say Something - Send History</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <AppProvider>
-          <PageContainer>
-            <Greeting />
-            <Space h="md" />
-            <Nickname />
-            <Space h="md" />
-            <MessageInput />
-            <Space h="md" />
-            <span className={styles.buttonControls}>
-              <SendMessageButton />
-              <ViewMessageButton />
-            </span>
-            <SendTimer />
-            <ViewTimer />
-          </PageContainer>
-        </AppProvider>
+        <PageContainer>
+          {messagesForUser.map((message) => (
+            <>
+              <MessageCard key={message.id} message={message} readonly={true} />
+              <Space h="md" />
+            </>
+          ))}
+        </PageContainer>
       </main>
     </>
   );
@@ -71,6 +65,7 @@ export async function getServerSideProps(context: {
   req: NextApiRequest;
   res: ServerResponse | NextApiResponse<any>;
 }) {
+  // todo: make all this a util
   const data = await unstable_getServerSession(
     context.req,
     context.res,
@@ -90,4 +85,4 @@ export async function getServerSideProps(context: {
   };
 }
 
-export default Index;
+export default SendHistory;

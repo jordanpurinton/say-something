@@ -100,27 +100,4 @@ export default createRouter()
         },
       });
     },
-  })
-  .mutation('update-viewed-message-ids', {
-    input: z.object({
-      id: z.string(),
-      messageIds: z.string(),
-    }),
-    async resolve({ ctx, input }) {
-      const session = await getServerSession(ctx);
-      const sessionId = session?.userProfile.id;
-
-      if (sessionId !== input.id) {
-        return throwForbidden();
-      }
-
-      await prisma.user.update({
-        where: {
-          id: input.messageIds,
-        },
-        data: {
-          viewedMessageIds: input.messageIds,
-        },
-      });
-    },
   });
