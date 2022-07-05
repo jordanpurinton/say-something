@@ -1,3 +1,3 @@
-# Create T3 App
+# say-something
 
-This is an app bootstrapped according to the [init.tips](https://init.tips) stack, also known as the T3-Stack.
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/jordanpurinton/say-something/GFpUtTo4USLjVYU9m8i2BViygqsr)
