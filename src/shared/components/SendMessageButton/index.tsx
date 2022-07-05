@@ -48,7 +48,6 @@ export const SendMessageButton: FC = () => {
 
     createMessageMutation.mutateAsync({
       content: messageContent,
-      userId: user?.id as string,
       nickname: nickname || DEFAULT_NICKNAME,
     });
 

@@ -14,12 +14,7 @@ export const ViewMessageButton: FC = () => {
     useViewMessageModalIsOpen();
 
   const { data, refetch, isFetching, isError } = trpc.useQuery(
-    [
-      'message.get-random',
-      {
-        userId: user?.id as string,
-      },
-    ],
+    ['message.get-random'],
     {
       enabled: false,
     }

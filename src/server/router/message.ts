@@ -1,32 +1,37 @@
-import * as trpc from '@trpc/server';
 import { z } from 'zod';
 import { prisma } from '../db/prisma';
+import {
+  getServerSession,
+  throwBadRequest,
+  throwNotFound,
+  throwServerError,
+} from '../utils';
 import { createRouter } from './context';
 
 export default createRouter()
   .mutation('create', {
     input: z.object({
       content: z.string(),
-      userId: z.string(),
       nickname: z.string(),
     }),
-    async resolve({ input }) {
-      const { content, userId, nickname } = input;
+    async resolve({ ctx, input }) {
+      const { content, nickname } = input;
+      const session = await getServerSession(ctx);
+      const sessionId = session?.userProfile.id;
 
       const user = await prisma.user.findUnique({
         where: {
-          id: input.userId,
+          id: sessionId as string,
         },
       });
 
       if ((user?.canSendMessageTimestamp as Date) > new Date()) {
-        throw new trpc.TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'canSendMessageTimestamp must be in the past',
-        });
+        return throwBadRequest('canSendMessageTimestamp must be in the past');
       }
 
-      await prisma.message.create({ data: { content, userId, nickname } });
+      await prisma.message.create({
+        data: { content, userId: sessionId as string, nickname },
+      });
     },
   })
   .query('find', {
@@ -43,42 +48,37 @@ export default createRouter()
     },
   })
   .query('find-by-user', {
-    input: z.object({
-      userId: z.string(),
-    }),
-    async resolve({ input }) {
+    async resolve({ ctx }) {
+      const session = await getServerSession(ctx);
+      const sessionId = session?.userProfile.id;
+
       const messages = await prisma.message.findMany({
         where: {
-          userId: input.userId,
+          userId: sessionId,
         },
       });
 
       if (messages.length === 0) {
-        throw new trpc.TRPCError({
-          code: 'NOT_FOUND',
-          message: `No messages found for user with id: ${input.userId}`,
-        });
+        return throwNotFound(
+          `No messages found for user with id: ${sessionId}`
+        );
       }
 
       return { success: true, messages };
     },
   })
   .query('get-random', {
-    input: z.object({
-      userId: z.string(),
-    }),
-    async resolve({ input }) {
+    async resolve({ ctx }) {
+      const session = await getServerSession(ctx);
+
       const user = await prisma.user.findUnique({
         where: {
-          id: input.userId,
+          id: session?.userProfile.id,
         },
       });
 
       if ((user?.canViewMessageTimestamp as Date) > new Date()) {
-        throw new trpc.TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'canViewMessageTimestamp must be in the past',
-        });
+        return throwBadRequest('canViewMessageTimestamp must be in the past');
       }
 
       const count = await prisma.message.count();
@@ -108,10 +108,7 @@ export default createRouter()
       });
 
       if (!message) {
-        throw new trpc.TRPCError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Message not found',
-        });
+        return throwServerError('Message not found');
       }
 
       await prisma.message.update({
@@ -136,10 +133,7 @@ export default createRouter()
       });
 
       if (!message) {
-        throw new trpc.TRPCError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Message not found',
-        });
+        return throwServerError('Message not found');
       }
 
       await prisma.message.update({
@@ -164,10 +158,7 @@ export default createRouter()
       });
 
       if (!message) {
-        throw new trpc.TRPCError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Message not found',
-        });
+        return throwServerError('Message not found');
       }
 
       await prisma.message.update({
