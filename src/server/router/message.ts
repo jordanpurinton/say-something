@@ -22,11 +22,11 @@ export default createRouter()
 
       const user = await prisma.user.findUnique({
         where: {
-          id: sessionId as string,
+          id: sessionId,
         },
       });
 
-      if ((user?.canSendMessageTimestamp as Date) > new Date()) {
+      if ((user?.canSendMessageTimestamp || -1) > new Date()) {
         return throwBadRequest('canSendMessageTimestamp must be in the past');
       }
 
@@ -78,7 +78,7 @@ export default createRouter()
         },
       });
 
-      if ((user?.canViewMessageTimestamp as Date) > new Date()) {
+      if ((user?.canViewMessageTimestamp || -1) > new Date()) {
         return throwBadRequest('canViewMessageTimestamp must be in the past');
       }
 
@@ -226,12 +226,12 @@ export default createRouter()
         messagesToReturn = await prisma.message.findMany({
           where: {
             id: {
-              in: viewedMessageIds as number[],
+              in: (viewedMessageIds as []) || [],
             },
           },
         });
       }
 
-      return { success: true, messages: messagesToReturn };
+      return { success: true, messages: messagesToReturn || [] };
     },
   });

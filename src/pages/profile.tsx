@@ -1,38 +1,35 @@
 import { Center, Space, Text } from '@mantine/core';
-import { Message } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse, NextPage } from 'next';
 import Head from 'next/head';
 import React, { useEffect } from 'react';
 import { ServerResponse } from 'http';
 import { useSession } from 'next-auth/react';
+import Greeting from '../shared/components/Greeting';
+import MessageInput from '../shared/components/MessageInput';
+import Nickname from '../shared/components/Nickname';
+import SendMessageButton from '../shared/components/SendMessageButton';
+import SendTimer from '../shared/components/SendTimer';
+import ViewMessageButton from '../shared/components/ViewMessageButton';
+import { AppProvider } from '../shared/context/AppContext';
+import styles from '../shared/styles/Index.module.scss';
 import { SerializedUser } from '../shared/types';
+import ViewTimer from '../shared/components/ViewTimer';
 import { useUser } from '../shared/context/UserContext';
-import MessageCard from '../shared/components/MessageCard';
-import { trpc } from '../shared/utils/trpc';
 import PageContainer from '../shared/containers/PageContainer';
 import { useSetInitUser } from '../shared/hooks/useSetInitUser';
 import { getUserServerSide } from '../shared/utils/getUserServerSide';
 
-const SendHistory: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
+const Index: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
   const { data } = useSession();
   const { user } = useUser();
   const setInitUser = useSetInitUser();
-  const [messagesForUser, setMessagesForUser] = React.useState<Message[]>([]);
-  const findMessagesByUserQuery = trpc.useQuery(['message.find-by-user'], {
-    enabled: false,
-  });
 
   useEffect(() => {
     setInitUser(userData);
-    const fetchMessageData = async () => {
-      const messageData = await findMessagesByUserQuery.refetch();
-      setMessagesForUser(messageData?.data?.messages || []);
-    };
-    fetchMessageData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (!data || !user || findMessagesByUserQuery.isLoading) {
+  if (!data || !user) {
     return (
       <Center>
         <Text>Loading...</Text>
@@ -43,18 +40,26 @@ const SendHistory: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
   return (
     <>
       <Head>
-        <title>Say Something - Send History</title>
+        <title>Say Something</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <PageContainer>
-          {messagesForUser.map((message) => (
-            <>
-              <MessageCard key={message.id} message={message} readonly={true} />
-              <Space h="md" />
-            </>
-          ))}
-        </PageContainer>
+        <AppProvider>
+          <PageContainer>
+            <Greeting />
+            <Space h="md" />
+            <Nickname />
+            <Space h="md" />
+            <MessageInput />
+            <Space h="md" />
+            <span className={styles.buttonControls}>
+              <SendMessageButton />
+              <ViewMessageButton />
+            </span>
+            <SendTimer />
+            <ViewTimer />
+          </PageContainer>
+        </AppProvider>
       </main>
     </>
   );
@@ -70,4 +75,4 @@ export async function getServerSideProps(context: {
   };
 }
 
-export default SendHistory;
+export default Index;

@@ -40,24 +40,24 @@ export const throwForbidden = () => {
   });
 };
 
-export const getVerifiedToken = (req: NextApiRequest) => {
+export const getVerifiedToken = (req: NextApiRequest): JwtPayload | undefined => {
   try {
     const verified = jwt.verify(
-      req.cookies.access_token as string,
-      process.env.NEXTAUTH_SECRET as string
+      req.cookies.access_token || '',
+      process.env.NEXTAUTH_SECRET || ''
     );
 
     if (!verified) throwUnauthorized();
 
-    return verified;
+    return verified as JwtPayload;
   } catch (err) {
     console.error(err);
     throwUnauthorized();
   }
 };
 
-export const checkTokenExp = (token: JwtPayload) => {
-  if ((token?.exp as number) < Date.now() / 1000) {
+export const checkTokenExp = (token: JwtPayload | undefined) => {
+  if ((token?.exp || -1) < Date.now() / 1000) {
     throwUnauthorized();
   }
 };

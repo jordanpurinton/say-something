@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "db-connect": "pscale connect say-something dev --port 3309",
+    "db-connect": "pscale connect say-something main --port 3309",
     "db-push": "npx prisma db push",
     "db-reset": "npx prisma migrate reset && npm run db-push",
     "postinstall": "prisma generate",

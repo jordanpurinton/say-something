@@ -1,10 +1,7 @@
 import { Center, Space, Text } from '@mantine/core';
-import { User } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse, NextPage } from 'next';
-import { unstable_getServerSession } from 'next-auth';
 import Head from 'next/head';
 import React, { useEffect } from 'react';
-import superjson from 'superjson';
 import { ServerResponse } from 'http';
 import { useSession } from 'next-auth/react';
 import Greeting from '../shared/components/Greeting';
@@ -15,19 +12,20 @@ import SendTimer from '../shared/components/SendTimer';
 import ViewMessageButton from '../shared/components/ViewMessageButton';
 import { AppProvider } from '../shared/context/AppContext';
 import styles from '../shared/styles/Index.module.scss';
-import { authOptions } from './api/auth/[...nextauth]';
 import { SerializedUser } from '../shared/types';
-import { setInitUser } from '../shared/utils/user';
+import { useSetInitUser } from '../shared/hooks/useSetInitUser';
 import ViewTimer from '../shared/components/ViewTimer';
 import { useUser } from '../shared/context/UserContext';
 import PageContainer from '../shared/containers/PageContainer';
+import { getUserServerSide } from '../shared/utils/getUserServerSide';
 
 const Index: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
   const { data } = useSession();
-  const { user, setUser } = useUser();
+  const { user } = useUser();
+  const setInitUser = useSetInitUser();
 
   useEffect(() => {
-    setUser(setInitUser(userData));
+    setInitUser(userData);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -71,22 +69,9 @@ export async function getServerSideProps(context: {
   req: NextApiRequest;
   res: ServerResponse | NextApiResponse<any>;
 }) {
-  const data = await unstable_getServerSession(
-    context.req,
-    context.res,
-    authOptions
-  );
-
-  if (!data?.token) {
-    context.res.writeHead(302, { Location: '/api/auth/signin' });
-  }
-
-  context.res.setHeader('Set-Cookie', [
-    `access_token=${data?.token as string}`,
-  ]);
-
+  const userData = await getUserServerSide(context);
   return {
-    props: { userData: superjson.serialize(data?.userProfile as User).json },
+    props: { userData },
   };
 }
 
