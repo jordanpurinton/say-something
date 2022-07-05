@@ -66,6 +66,7 @@ export async function getServerSideProps(context: {
   res: ServerResponse | NextApiResponse<any>;
 }) {
   // todo: make all this a util
+  // look into trpc server side fetching
   const data = await unstable_getServerSession(
     context.req,
     context.res,
