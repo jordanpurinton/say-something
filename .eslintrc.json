@@ -1,3 +1,30 @@
 {
-  "extends": ["eslint:recommended", "next", "prettier"]
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": ["./tsconfig.json"]
+  },
+  "extends": ["next/core-web-vitals", "prettier", "airbnb-typescript"],
+  "rules": {
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "error",
+    "react/function-component-definition": [
+      2,
+      {
+        "namedComponents": "arrow-function",
+        "unnamedComponents": "arrow-function"
+      }
+    ],
+    "@typescript-eslint/comma-dangle": "off",
+    "@typescript-eslint/no-unused-expressions": [
+      "error",
+      { "allowTernary": true }
+    ],
+    "operator-linebreak": "off",
+    "import/prefer-default-export": "off",
+    "import/no-named-as-default": "off",
+    "react/prop-types": "off"
+  },
+  "plugins": ["@typescript-eslint"],
+  "ignorePatterns": ["/*.*"]
 }

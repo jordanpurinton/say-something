@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo
+echo "RUNNING PRETTIER:"
+echo
+npx prettier --write .
+echo
+echo "RUNNING ESLINT:"
+echo
+npx eslint . --ext .js,.jsx,.ts,.tsx --fix
