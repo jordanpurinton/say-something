@@ -18,6 +18,7 @@ const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
+    // @ts-ignore
     async session({ session, token }) {
       const user = await prisma.user.findUnique({
         where: {
