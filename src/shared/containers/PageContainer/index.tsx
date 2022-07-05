@@ -1,13 +1,13 @@
 import { Container } from '@mantine/core';
 import React, { FC, ReactNode } from 'react';
-import styles from '../../styles/HomeContainer.module.scss';
+import styles from '../../styles/PageContainer.module.scss';
 
-interface HomeContainerProps {
+interface PageContainerProps {
   children: ReactNode;
 }
 
-const HomeContainer: FC<HomeContainerProps> = ({ children }) => (
+const PageContainer: FC<PageContainerProps> = ({ children }) => (
   <Container className={styles.flexContainer}>{children}</Container>
 );
 
-export default HomeContainer;
+export default PageContainer;

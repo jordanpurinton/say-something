@@ -5,4 +5,22 @@
 
 .headerButton {
   color: #fff;
+  display: inline;
+}
+
+.headerAnchor {
+  color: #fff;
+  display: inline;
+}
+
+.headerAnchor > h2 {
+  display: inline;
+}
+
+.headerAnchor > div {
+  display: inline;
+}
+
+.headerLink {
+  margin-left: 2em;
 }

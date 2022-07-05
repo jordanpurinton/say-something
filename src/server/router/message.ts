@@ -1,32 +1,38 @@
-import * as trpc from '@trpc/server';
+import { Message } from '@prisma/client';
 import { z } from 'zod';
 import { prisma } from '../db/prisma';
+import {
+  getServerSession,
+  throwBadRequest,
+  throwNotFound,
+  throwServerError,
+} from '../utils';
 import { createRouter } from './context';
 
 export default createRouter()
   .mutation('create', {
     input: z.object({
       content: z.string(),
-      userId: z.string(),
       nickname: z.string(),
     }),
-    async resolve({ input }) {
-      const { content, userId, nickname } = input;
+    async resolve({ ctx, input }) {
+      const { content, nickname } = input;
+      const session = await getServerSession(ctx);
+      const sessionId = session?.userProfile.id;
 
       const user = await prisma.user.findUnique({
         where: {
-          id: input.userId,
+          id: sessionId as string,
         },
       });
 
       if ((user?.canSendMessageTimestamp as Date) > new Date()) {
-        throw new trpc.TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'canSendMessageTimestamp must be in the past',
-        });
+        return throwBadRequest('canSendMessageTimestamp must be in the past');
       }
 
-      await prisma.message.create({ data: { content, userId, nickname } });
+      await prisma.message.create({
+        data: { content, userId: sessionId as string, nickname },
+      });
     },
   })
   .query('find', {
@@ -43,64 +49,73 @@ export default createRouter()
     },
   })
   .query('find-by-user', {
-    input: z.object({
-      userId: z.string(),
-    }),
-    async resolve({ input }) {
+    async resolve({ ctx }) {
+      const session = await getServerSession(ctx);
+      const sessionId = session?.userProfile.id;
+
       const messages = await prisma.message.findMany({
         where: {
-          userId: input.userId,
+          userId: sessionId,
         },
       });
 
       if (messages.length === 0) {
-        throw new trpc.TRPCError({
-          code: 'NOT_FOUND',
-          message: `No messages found for user with id: ${input.userId}`,
-        });
+        return throwNotFound(
+          `No messages found for user with id: ${sessionId}`
+        );
       }
 
       return { success: true, messages };
     },
   })
   .query('get-random', {
-    input: z.object({
-      userId: z.string(),
-    }),
-    async resolve({ input }) {
+    async resolve({ ctx }) {
+      const session = await getServerSession(ctx);
+
       const user = await prisma.user.findUnique({
         where: {
-          id: input.userId,
+          id: session?.userProfile.id,
         },
       });
 
       if ((user?.canViewMessageTimestamp as Date) > new Date()) {
-        throw new trpc.TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'canViewMessageTimestamp must be in the past',
-        });
+        return throwBadRequest('canViewMessageTimestamp must be in the past');
       }
 
-      const count = await prisma.message.count();
-      const id = Math.floor(Math.random() * count) + 1;
-
-      const message = await prisma.message.findMany({
+      const message = await prisma.message.findFirst({
         where: {
-          id: {
-            equals: id,
+          userId: {
+            not: session?.userProfile.id,
           },
         },
         take: 1,
       });
 
-      return { success: true, message: message[0] };
+      const prevViewedMessageIds = user?.viewedMessageIds.split(',') || [];
+      const newViewedMessageIdsString = [
+        ...prevViewedMessageIds,
+        message?.id || '',
+      ].join(',');
+      await prisma.user.update({
+        where: {
+          id: session?.userProfile.id,
+        },
+        data: {
+          viewedMessageIds: {
+            set: newViewedMessageIdsString,
+          },
+        },
+      });
+
+      return { success: true, message: message };
     },
   })
   .mutation('upvote-message', {
     input: z.object({
       id: z.number(),
     }),
-    async resolve({ input }) {
+    async resolve({ ctx, input }) {
+      const session = await getServerSession(ctx);
       const message = await prisma.message.findUnique({
         where: {
           id: input.id,
@@ -108,10 +123,11 @@ export default createRouter()
       });
 
       if (!message) {
-        throw new trpc.TRPCError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Message not found',
-        });
+        return throwServerError('Message not found');
+      }
+
+      if (message.userId === session?.userProfile.id) {
+        return throwBadRequest('Cannot upvote your own message');
       }
 
       await prisma.message.update({
@@ -128,7 +144,8 @@ export default createRouter()
     input: z.object({
       id: z.number(),
     }),
-    async resolve({ input }) {
+    async resolve({ ctx, input }) {
+      const session = await getServerSession(ctx);
       const message = await prisma.message.findUnique({
         where: {
           id: input.id,
@@ -136,10 +153,11 @@ export default createRouter()
       });
 
       if (!message) {
-        throw new trpc.TRPCError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Message not found',
-        });
+        return throwServerError('Message not found');
+      }
+
+      if (message.userId === session?.userProfile.id) {
+        return throwBadRequest('Cannot downvote your own message');
       }
 
       await prisma.message.update({
@@ -164,10 +182,7 @@ export default createRouter()
       });
 
       if (!message) {
-        throw new trpc.TRPCError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Message not found',
-        });
+        return throwServerError('Message not found');
       }
 
       await prisma.message.update({
@@ -178,5 +193,45 @@ export default createRouter()
           views: message.views + 1,
         },
       });
+    },
+  })
+  .query('find-viewed-messages', {
+    async resolve({ ctx }) {
+      const session = await getServerSession(ctx);
+
+      const user = await prisma.user.findUnique({
+        where: {
+          id: session?.userProfile.id,
+        },
+      });
+
+      const viewedMessageIds = Array.from(
+        new Set(
+          user?.viewedMessageIds
+            .split(',')
+            .map((id) => {
+              const parsedId = parseInt(id) || -1;
+              if (isNaN(parsedId)) {
+                return;
+              }
+              if (!isNaN(parsedId) && parsedId > -1) return parsedId;
+            })
+            .filter((id) => !!id)
+        )
+      );
+
+      let messagesToReturn: Message[] = [];
+
+      if (viewedMessageIds.length > 0) {
+        messagesToReturn = await prisma.message.findMany({
+          where: {
+            id: {
+              in: viewedMessageIds as number[],
+            },
+          },
+        });
+      }
+
+      return { success: true, messages: messagesToReturn };
     },
   });

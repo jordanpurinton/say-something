@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { prisma } from '../db/prisma';
 import { createRouter } from './context';
+import { getServerSession, throwForbidden, throwServerError } from '../utils';
 
 export default createRouter()
   .mutation('create', {
@@ -13,7 +14,7 @@ export default createRouter()
     }),
     async resolve({ input }) {
       const derived = {
-        account: prisma.account.findUnique({
+        account: await prisma.account.findUnique({
           where: {
             id: input.id,
           },
@@ -21,6 +22,10 @@ export default createRouter()
         sessions: [],
         messages: [],
       };
+
+      if (!derived?.account?.id) {
+        return throwServerError('Account not found');
+      }
 
       await prisma.user.create({
         data: {
@@ -34,7 +39,14 @@ export default createRouter()
     input: z.object({
       id: z.string(),
     }),
-    async resolve({ input }) {
+    async resolve({ ctx, input }) {
+      const session = await getServerSession(ctx);
+      const sessionId = session?.userProfile.id;
+
+      if (sessionId !== input.id) {
+        return throwForbidden();
+      }
+
       const user = await prisma.user.findUnique({
         where: {
           id: input.id,
@@ -48,7 +60,14 @@ export default createRouter()
       id: z.string(),
       canSendMessageTimestamp: z.string(),
     }),
-    async resolve({ input }) {
+    async resolve({ ctx, input }) {
+      const session = await getServerSession(ctx);
+      const sessionId = session?.userProfile.id;
+
+      if (sessionId !== input.id) {
+        return throwForbidden();
+      }
+
       await prisma.user.update({
         where: {
           id: input.id,
@@ -64,7 +83,14 @@ export default createRouter()
       id: z.string(),
       canViewMessageTimestamp: z.string(),
     }),
-    async resolve({ input }) {
+    async resolve({ ctx, input }) {
+      const session = await getServerSession(ctx);
+      const sessionId = session?.userProfile.id;
+
+      if (sessionId !== input.id) {
+        return throwForbidden();
+      }
+
       await prisma.user.update({
         where: {
           id: input.id,
