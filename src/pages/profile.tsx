@@ -1,4 +1,4 @@
-import { Avatar, Button, Center, List, Space, } from '@mantine/core';
+import { Avatar, Button, Center, List, Space } from '@mantine/core';
 import type { NextApiRequest, NextApiResponse, NextPage } from 'next';
 import React, { useCallback, useEffect } from 'react';
 import { ServerResponse } from 'http';
