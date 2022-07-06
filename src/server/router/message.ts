@@ -1,12 +1,7 @@
 import { Message } from '@prisma/client';
 import { z } from 'zod';
 import { prisma } from '../db/prisma';
-import {
-  getServerSession,
-  throwBadRequest,
-  throwNotFound,
-  throwServerError,
-} from '../utils';
+import { getServerSession, throwBadRequest, throwServerError } from '../utils';
 import { createRouter } from './context';
 
 export default createRouter()
@@ -60,9 +55,7 @@ export default createRouter()
       });
 
       if (messages.length === 0) {
-        return throwNotFound(
-          `No messages found for user with id: ${sessionId}`
-        );
+        return { success: false, messages: [] };
       }
 
       return { success: true, messages };
@@ -230,6 +223,8 @@ export default createRouter()
             },
           },
         });
+      } else if (viewedMessageIds.length === 0) {
+        return { success: true, messages: [] };
       }
 
       return { success: true, messages: messagesToReturn || [] };

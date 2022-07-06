@@ -12,12 +12,13 @@ import { trpc } from '../shared/utils/trpc';
 import PageContainer from '../shared/containers/PageContainer';
 import { useSetInitUser } from '../shared/hooks/useSetInitUser';
 import { getUserServerSide } from '../shared/utils/getUserServerSide';
+import MessageCount from '../shared/components/MessageCount';
 
 const SendHistory: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
   const { data } = useSession();
   const { user } = useUser();
   const setInitUser = useSetInitUser();
-  const [messagesForUser, setMessagesForUser] = React.useState<Message[]>([]);
+  const [sentMessages, setSentMessages] = React.useState<Message[]>([]);
   const findMessagesByUserQuery = trpc.useQuery(['message.find-by-user'], {
     enabled: false,
   });
@@ -26,7 +27,7 @@ const SendHistory: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
     setInitUser(userData);
     const fetchMessageData = async () => {
       const messageData = await findMessagesByUserQuery.refetch();
-      setMessagesForUser(messageData?.data?.messages || []);
+      setSentMessages(messageData?.data?.messages || []);
     };
     fetchMessageData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -48,7 +49,8 @@ const SendHistory: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
       </Head>
       <main>
         <PageContainer>
-          {messagesForUser.map((message) => (
+          <MessageCount count={sentMessages.length} />
+          {sentMessages.map((message) => (
             <>
               <MessageCard key={message.id} message={message} readonly={true} />
               <Space h="md" />

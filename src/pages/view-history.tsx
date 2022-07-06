@@ -2,7 +2,7 @@ import { Center, Space, Text } from '@mantine/core';
 import { Message } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse, NextPage } from 'next';
 import Head from 'next/head';
-import React, { useEffect } from 'react';
+import React, { Fragment, useEffect } from 'react';
 import { ServerResponse } from 'http';
 import { useSession } from 'next-auth/react';
 import { SerializedUser } from '../shared/types';
@@ -12,12 +12,13 @@ import { trpc } from '../shared/utils/trpc';
 import PageContainer from '../shared/containers/PageContainer';
 import { useSetInitUser } from '../shared/hooks/useSetInitUser';
 import { getUserServerSide } from '../shared/utils/getUserServerSide';
+import MessageCount from '../shared/components/MessageCount';
 
 const ViewHistory: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
   const { data } = useSession();
   const { user } = useUser();
   const setInitUser = useSetInitUser();
-  const [messagesForUser, setMessagesForUser] = React.useState<Message[]>([]);
+  const [viewedMessages, setViewedMessages] = React.useState<Message[]>([]);
   const findViewedMessagesQuery = trpc.useQuery(
     ['message.find-viewed-messages'],
     {
@@ -29,7 +30,7 @@ const ViewHistory: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
     setInitUser(userData);
     const fetchMessageData = async () => {
       const messageData = await findViewedMessagesQuery.refetch();
-      setMessagesForUser(messageData?.data?.messages || []);
+      setViewedMessages(messageData?.data?.messages || []);
     };
     fetchMessageData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -51,11 +52,12 @@ const ViewHistory: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
       </Head>
       <main>
         <PageContainer>
-          {messagesForUser.map((message) => (
-            <>
+          <MessageCount count={viewedMessages.length} />
+          {viewedMessages.map((message) => (
+            <Fragment key={message.id}>
               <MessageCard key={message.id} message={message} readonly={true} />
               <Space h="md" />
-            </>
+            </Fragment>
           ))}
         </PageContainer>
       </main>

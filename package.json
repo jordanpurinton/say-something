@@ -10,6 +10,7 @@
     "db-connect": "pscale connect say-something dev --port 3309",
     "db-push": "npx prisma db push",
     "db-reset": "npx prisma migrate reset && npm run db-push",
+    "db-shell": "pscale shell say-something dev",
     "postinstall": "prisma generate",
     "prepare": "husky install"
   },

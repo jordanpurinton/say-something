@@ -1,6 +1,6 @@
-import { Avatar, Center, List, Space, Text } from '@mantine/core';
+import { Avatar, Button, Center, List, Space, Text } from '@mantine/core';
 import type { NextApiRequest, NextApiResponse, NextPage } from 'next';
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { ServerResponse } from 'http';
 import { useSession } from 'next-auth/react';
 import { SerializedUser } from '../shared/types';
@@ -9,11 +9,20 @@ import { useSetInitUser } from '../shared/hooks/useSetInitUser';
 import { getUserServerSide } from '../shared/utils/getUserServerSide';
 import PageContainer from '../shared/containers/PageContainer';
 import { profileTableData } from '../shared/constants';
+import { trpc } from '../shared/utils/trpc';
+import { useRouter } from 'next/router';
 
 const Index: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
   const { data } = useSession();
   const { user } = useUser();
+  const router = useRouter();
   const setInitUser = useSetInitUser();
+  const deleteUserMutation = trpc.useMutation(['user.delete']);
+
+  const handleDeleteUser = useCallback(async () => {
+    await deleteUserMutation.mutateAsync();
+    router.push('/api/auth/signin');
+  }, [deleteUserMutation, router]);
 
   useEffect(() => {
     setInitUser(userData);
@@ -46,6 +55,18 @@ const Index: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
           </List.Item>
         ))}
       </List>
+      <Space h="md" />
+      <Space h="md" />
+      <Button
+        onClick={handleDeleteUser}
+        loading={deleteUserMutation.isLoading}
+        loaderPosition="right"
+        size="lg"
+        color="red"
+        variant="light"
+      >
+        Delete
+      </Button>
     </PageContainer>
   );
 };

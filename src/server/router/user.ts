@@ -100,4 +100,15 @@ export default createRouter()
         },
       });
     },
+  })
+  .mutation('delete', {
+    async resolve({ ctx }) {
+      const session = await getServerSession(ctx);
+
+      await prisma.user.delete({
+        where: {
+          id: session?.userProfile.id,
+        },
+      });
+    },
   });
