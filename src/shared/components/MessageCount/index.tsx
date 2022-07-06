@@ -1,9 +1,9 @@
 import { Container, Text } from '@mantine/core';
 import { FC } from 'react';
 
-type MessageCountProps = {
+interface MessageCountProps {
   count: number;
-};
+}
 
 export const MessageCount: FC<MessageCountProps> = ({ count }) => {
   return (

@@ -1,4 +1,4 @@
-import { Avatar, Button, Center, List, Space, Text } from '@mantine/core';
+import { Avatar, Button, Center, List, Space } from '@mantine/core';
 import type { NextApiRequest, NextApiResponse, NextPage } from 'next';
 import React, { useCallback, useEffect } from 'react';
 import { ServerResponse } from 'http';
@@ -11,8 +11,9 @@ import PageContainer from '../shared/containers/PageContainer';
 import { profileTableData } from '../shared/constants';
 import { trpc } from '../shared/utils/trpc';
 import { useRouter } from 'next/router';
+import Loading from '../shared/components/Loading';
 
-const Index: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
+const Profile: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
   const { data } = useSession();
   const { user } = useUser();
   const router = useRouter();
@@ -30,11 +31,7 @@ const Index: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
   }, []);
 
   if (!data || !user) {
-    return (
-      <Center>
-        <Text>Loading...</Text>
-      </Center>
-    );
+    return <Loading text="Fetching profile..." />;
   }
 
   return (
@@ -81,4 +78,4 @@ export async function getServerSideProps(context: {
   };
 }
 
-export default Index;
+export default Profile;

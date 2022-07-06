@@ -1,4 +1,4 @@
-import { Center, Space, Text } from '@mantine/core';
+import { Space } from '@mantine/core';
 import type { NextApiRequest, NextApiResponse, NextPage } from 'next';
 import Head from 'next/head';
 import React, { useEffect } from 'react';
@@ -18,6 +18,7 @@ import ViewTimer from '../shared/components/ViewTimer';
 import { useUser } from '../shared/context/UserContext';
 import PageContainer from '../shared/containers/PageContainer';
 import { getUserServerSide } from '../shared/utils/getUserServerSide';
+import Loading from '../shared/components/Loading';
 
 const Index: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
   const { data } = useSession();
@@ -30,11 +31,7 @@ const Index: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
   }, []);
 
   if (!data || !user) {
-    return (
-      <Center>
-        <Text>Loading...</Text>
-      </Center>
-    );
+    return <Loading text="Fetching data..." />;
   }
 
   return (
