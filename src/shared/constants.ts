@@ -12,12 +12,12 @@ export type VoteChoice = Vote | undefined;
 
 export const profileTableData = [
   {
-    key: 'id',
-    label: 'User ID',
-  },
-  {
     key: 'name',
     label: 'Name',
+  },
+  {
+    key: 'id',
+    label: 'User ID',
   },
   {
     key: 'email',

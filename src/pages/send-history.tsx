@@ -1,4 +1,4 @@
-import { Center, Space, Text } from '@mantine/core';
+import { Space } from '@mantine/core';
 import { Message } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse, NextPage } from 'next';
 import Head from 'next/head';
@@ -13,6 +13,7 @@ import PageContainer from '../shared/containers/PageContainer';
 import { useSetInitUser } from '../shared/hooks/useSetInitUser';
 import { getUserServerSide } from '../shared/utils/getUserServerSide';
 import MessageCount from '../shared/components/MessageCount';
+import Loading from '../shared/components/Loading';
 
 const SendHistory: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
   const { data } = useSession();
@@ -34,11 +35,7 @@ const SendHistory: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
   }, []);
 
   if (!data || !user || findMessagesByUserQuery.isLoading) {
-    return (
-      <Center>
-        <Text>Loading...</Text>
-      </Center>
-    );
+    return <Loading text="Fetching messages..." />;
   }
 
   return (
