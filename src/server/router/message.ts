@@ -1,12 +1,7 @@
 import { Message } from '@prisma/client';
 import { z } from 'zod';
 import { prisma } from '../db/prisma';
-import {
-  getServerSession,
-  throwBadRequest,
-  throwNotFound,
-  throwServerError,
-} from '../utils';
+import { getServerSession, throwBadRequest, throwServerError } from '../utils';
 import { createRouter } from './context';
 
 export default createRouter()
@@ -22,11 +17,11 @@ export default createRouter()
 
       const user = await prisma.user.findUnique({
         where: {
-          id: sessionId as string,
+          id: sessionId,
         },
       });
 
-      if ((user?.canSendMessageTimestamp as Date) > new Date()) {
+      if ((user?.canSendMessageTimestamp || -1) > new Date()) {
         return throwBadRequest('canSendMessageTimestamp must be in the past');
       }
 
@@ -60,9 +55,7 @@ export default createRouter()
       });
 
       if (messages.length === 0) {
-        return throwNotFound(
-          `No messages found for user with id: ${sessionId}`
-        );
+        return { success: false, messages: [] };
       }
 
       return { success: true, messages };
@@ -78,7 +71,7 @@ export default createRouter()
         },
       });
 
-      if ((user?.canViewMessageTimestamp as Date) > new Date()) {
+      if ((user?.canViewMessageTimestamp || -1) > new Date()) {
         return throwBadRequest('canViewMessageTimestamp must be in the past');
       }
 
@@ -226,12 +219,14 @@ export default createRouter()
         messagesToReturn = await prisma.message.findMany({
           where: {
             id: {
-              in: viewedMessageIds as number[],
+              in: (viewedMessageIds as []) || [],
             },
           },
         });
+      } else if (viewedMessageIds.length === 0) {
+        return { success: true, messages: [] };
       }
 
-      return { success: true, messages: messagesToReturn };
+      return { success: true, messages: messagesToReturn || [] };
     },
   });

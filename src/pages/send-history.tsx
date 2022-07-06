@@ -1,33 +1,33 @@
 import { Center, Space, Text } from '@mantine/core';
-import { Message, User } from '@prisma/client';
+import { Message } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse, NextPage } from 'next';
-import { unstable_getServerSession } from 'next-auth';
 import Head from 'next/head';
 import React, { useEffect } from 'react';
-import superjson from 'superjson';
 import { ServerResponse } from 'http';
 import { useSession } from 'next-auth/react';
-import { authOptions } from './api/auth/[...nextauth]';
 import { SerializedUser } from '../shared/types';
 import { useUser } from '../shared/context/UserContext';
 import MessageCard from '../shared/components/MessageCard';
 import { trpc } from '../shared/utils/trpc';
-import { setInitUser } from '../shared/utils/user';
 import PageContainer from '../shared/containers/PageContainer';
+import { useSetInitUser } from '../shared/hooks/useSetInitUser';
+import { getUserServerSide } from '../shared/utils/getUserServerSide';
+import MessageCount from '../shared/components/MessageCount';
 
 const SendHistory: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
   const { data } = useSession();
-  const { user, setUser } = useUser();
-  const [messagesForUser, setMessagesForUser] = React.useState<Message[]>([]);
+  const { user } = useUser();
+  const setInitUser = useSetInitUser();
+  const [sentMessages, setSentMessages] = React.useState<Message[]>([]);
   const findMessagesByUserQuery = trpc.useQuery(['message.find-by-user'], {
     enabled: false,
   });
 
   useEffect(() => {
-    setUser(setInitUser(userData));
+    setInitUser(userData);
     const fetchMessageData = async () => {
       const messageData = await findMessagesByUserQuery.refetch();
-      setMessagesForUser(messageData?.data?.messages as Message[]);
+      setSentMessages(messageData?.data?.messages || []);
     };
     fetchMessageData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -49,7 +49,8 @@ const SendHistory: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
       </Head>
       <main>
         <PageContainer>
-          {messagesForUser.map((message) => (
+          <MessageCount count={sentMessages.length} />
+          {sentMessages.map((message) => (
             <>
               <MessageCard key={message.id} message={message} readonly={true} />
               <Space h="md" />
@@ -65,24 +66,9 @@ export async function getServerSideProps(context: {
   req: NextApiRequest;
   res: ServerResponse | NextApiResponse<any>;
 }) {
-  // todo: make all this a util
-  // look into trpc server side fetching
-  const data = await unstable_getServerSession(
-    context.req,
-    context.res,
-    authOptions
-  );
-
-  if (!data?.token) {
-    context.res.writeHead(302, { Location: '/api/auth/signin' });
-  }
-
-  context.res.setHeader('Set-Cookie', [
-    `access_token=${data?.token as string}`,
-  ]);
-
+  const userData = await getUserServerSide(context);
   return {
-    props: { userData: superjson.serialize(data?.userProfile as User).json },
+    props: { userData },
   };
 }
 

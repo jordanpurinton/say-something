@@ -1,5 +1,4 @@
 import { Button } from '@mantine/core';
-import { Message } from '@prisma/client';
 import { isAfter } from 'date-fns';
 import React, { FC, useCallback, useMemo } from 'react';
 import { ArrowsShuffle } from 'tabler-icons-react';
@@ -44,7 +43,7 @@ export const ViewMessageButton: FC = () => {
         View Message
       </Button>
       {viewMessageModalIsOpen && data?.message && (
-        <ViewMessageModal randomMessage={data?.message as Message} />
+        <ViewMessageModal randomMessage={data?.message} />
       )}
     </>
   );

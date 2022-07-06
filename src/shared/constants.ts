@@ -9,3 +9,26 @@ export enum Vote {
 }
 
 export type VoteChoice = Vote | undefined;
+
+export const profileTableData = [
+  {
+    key: 'id',
+    label: 'User ID',
+  },
+  {
+    key: 'name',
+    label: 'Name',
+  },
+  {
+    key: 'email',
+    label: 'Email',
+  },
+  {
+    key: 'canViewMessageTimestamp',
+    label: 'Can View Message At',
+  },
+  {
+    key: 'canSendMessageTimestamp',
+    label: 'Can Send Message At',
+  },
+];

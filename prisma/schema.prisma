@@ -45,7 +45,7 @@ model Message {
     upvotes   Int      @default(0)
     downvotes Int      @default(0)
     nickname  String   @db.VarChar(30)
-    user      User     @relation(fields: [userId], references: [id])
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId    String
 }
 
