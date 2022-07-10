@@ -80,7 +80,9 @@ export const getServerSession = async (
   return session;
 };
 
-export const clearCookies = (res: ServerResponse | NextApiResponse<any> | undefined) => {
+export const clearCookies = (
+  res: ServerResponse | NextApiResponse<any> | undefined
+) => {
   res?.setHeader('Set-Cookie', [
     `${cookies[0]}=deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0`,
     `${cookies[1]}=deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0`,
