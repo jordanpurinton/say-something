@@ -37,7 +37,7 @@ const Index: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
   return (
     <>
       <Head>
-        <title>Say Something</title>
+        <title>Say Something - Home</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
