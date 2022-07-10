@@ -32,3 +32,10 @@ export const profileTableData = [
     label: 'Can Send Message At',
   },
 ];
+
+export const cookies = [
+  'access_token',
+  'next-auth.session-token',
+  'next-auth.csrf-token',
+  'next-auth.callback-url',
+];

@@ -12,17 +12,25 @@ import { profileTableData } from '../shared/constants';
 import { trpc } from '../shared/utils/trpc';
 import { useRouter } from 'next/router';
 import Loading from '../shared/components/Loading';
+import Head from 'next/head';
+import { Logout } from 'tabler-icons-react';
 
 const Profile: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
   const { data } = useSession();
   const { user } = useUser();
   const router = useRouter();
   const setInitUser = useSetInitUser();
+  const logoutUserMutation = trpc.useMutation(['user.log-out']);
   const deleteUserMutation = trpc.useMutation(['user.delete']);
+
+  const handleUserLogOut = useCallback(async () => {
+    await logoutUserMutation.mutateAsync();
+    router.reload();
+  }, [logoutUserMutation, router]);
 
   const handleDeleteUser = useCallback(async () => {
     await deleteUserMutation.mutateAsync();
-    router.push('/api/auth/signin');
+    router.reload();
   }, [deleteUserMutation, router]);
 
   useEffect(() => {
@@ -35,36 +43,55 @@ const Profile: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
   }
 
   return (
-    <PageContainer>
-      <List spacing="sm" size="sm">
-        <Center>
-          <Avatar
-            src={user.image}
-            alt={data?.user?.name || ''}
+    <>
+      <Head>
+        <title>Say Something - Profile</title>
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+      <main>
+        <PageContainer>
+          <List spacing="sm" size="sm">
+            <Center>
+              <Avatar
+                src={user.image}
+                alt={data?.user?.name || ''}
+                size="lg"
+                radius="xl"
+              />
+            </Center>
+            <Space h="md" />
+            {profileTableData.map((obj) => (
+              <List.Item key={obj.key}>
+                {obj.label}: {(user as any)[obj.key].toString()}
+              </List.Item>
+            ))}
+          </List>
+          <Space h="md" />
+          <Space h="md" />
+          <Button
+            onClick={handleUserLogOut}
+            rightIcon={<Logout />}
+            loaderPosition="right"
             size="lg"
-            radius="xl"
-          />
-        </Center>
-        <Space h="md" />
-        {profileTableData.map((obj) => (
-          <List.Item key={obj.key}>
-            {obj.label}: {(user as any)[obj.key].toString()}
-          </List.Item>
-        ))}
-      </List>
-      <Space h="md" />
-      <Space h="md" />
-      <Button
-        onClick={handleDeleteUser}
-        loading={deleteUserMutation.isLoading}
-        loaderPosition="right"
-        size="lg"
-        color="red"
-        variant="light"
-      >
-        Delete
-      </Button>
-    </PageContainer>
+            variant="light"
+          >
+            Log Out
+          </Button>
+          <Space h="md" />
+          <Space h="md" />
+          <Button
+            onClick={handleDeleteUser}
+            loading={deleteUserMutation.isLoading}
+            loaderPosition="right"
+            size="lg"
+            color="red"
+            variant="light"
+          >
+            Delete
+          </Button>
+        </PageContainer>
+      </main>
+    </>
   );
 };
 

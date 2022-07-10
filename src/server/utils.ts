@@ -4,6 +4,14 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
 import { authOptions } from '../pages/api/auth/[...nextauth]';
 import { Session, unstable_getServerSession } from 'next-auth';
+import { cookies } from '../shared/constants';
+import { ServerResponse } from 'http';
+
+type Context = {
+  req: NextApiRequest;
+  res: NextApiResponse<any>;
+  prisma: PrismaClient;
+};
 
 export const throwNotFound = (msg?: string) => {
   throw new trpc.TRPCError({
@@ -43,19 +51,14 @@ export const throwForbidden = () => {
 export const getVerifiedToken = (
   req: NextApiRequest
 ): JwtPayload | undefined => {
-  try {
-    const verified = jwt.verify(
-      req.cookies.access_token || '',
-      process.env.NEXTAUTH_SECRET || ''
-    );
+  const verified = jwt.verify(
+    req.cookies.access_token || '',
+    process.env.NEXTAUTH_SECRET || ''
+  );
 
-    if (!verified) throwUnauthorized();
+  if (!verified) throwUnauthorized();
 
-    return verified as JwtPayload;
-  } catch (err) {
-    console.error(err);
-    throwUnauthorized();
-  }
+  return verified as JwtPayload;
 };
 
 export const checkTokenExp = (token: JwtPayload | undefined) => {
@@ -64,15 +67,24 @@ export const checkTokenExp = (token: JwtPayload | undefined) => {
   }
 };
 
-export const getServerSession = async (ctx: {
-  req: NextApiRequest;
-  res: NextApiResponse<any>;
-  prisma: PrismaClient;
-}): Promise<Session | null> => {
+export const getServerSession = async (
+  ctx: Context | undefined
+): Promise<Session | null> => {
+  if (!ctx) return null;
+
   const session = await unstable_getServerSession(
     ctx.req,
     ctx.res,
     authOptions
   );
   return session;
+};
+
+export const clearCookies = (res: ServerResponse | NextApiResponse<any> | undefined) => {
+  res?.setHeader('Set-Cookie', [
+    `${cookies[0]}=deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0`,
+    `${cookies[1]}=deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0`,
+    `${cookies[2]}=deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0`,
+    `${cookies[3]}=deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0`,
+  ]);
 };

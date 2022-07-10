@@ -10,20 +10,21 @@
   display: inline;
 }
 
-.headerAnchor {
+.headerButton {
   color: #fff;
   display: inline;
 }
 
-.headerAnchor > h2 {
+.headerLink > h2 {
   display: inline;
 }
 
-.headerAnchor > div {
+.headerLink > div {
   display: inline;
 }
 
 .headerLink {
+  cursor: pointer;
   margin-left: 0.5em;
   margin-right: 0.5em;
 }
