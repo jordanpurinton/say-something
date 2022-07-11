@@ -87,10 +87,7 @@ export default createRouter()
       const newViewedMessageIds = (user?.viewedMessageIds ||
         {}) as Prisma.JsonObject;
 
-      if (
-        message &&
-        !newViewedMessageIds?.hasOwnProperty(message.id)
-      ) {
+      if (message && !newViewedMessageIds?.hasOwnProperty(message.id)) {
         newViewedMessageIds[message.id] = true;
       }
 
