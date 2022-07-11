@@ -33,6 +33,7 @@ import { createSSGHelpers } from '@trpc/react/ssg';
 import superjson from 'superjson';
 import { ChangeEvent } from 'react';
 import { signOut } from 'next-auth/react';
+import { prisma } from '../server/db/prisma';
 
 const Profile: NextPage<{
   messagesSent: number;
