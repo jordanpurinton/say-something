@@ -75,6 +75,7 @@ export const SendMessageButton: FC = () => {
     setMessageContent,
   ]);
 
+  // todo: fix disabled not updating when user countdown expires
   return (
     <Button
       disabled={shouldDisable}

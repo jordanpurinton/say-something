@@ -13,7 +13,7 @@ export const Avatar: FC = () => {
           className={styles.avatar}
           src={data?.user?.image || ''}
           alt={data?.user?.name || ''}
-          size="md"
+          size={32}
         />
       </Anchor>
     </UnstyledButton>

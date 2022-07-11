@@ -18,6 +18,7 @@ import { useUser } from '../shared/context/UserContext';
 import PageContainer from '../shared/containers/PageContainer';
 import { getUserServerSide } from '../shared/utils/getUserServerSide';
 import Loading from '../shared/components/Loading';
+import styles from '../shared/styles/Index.module.scss';
 
 const Index: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
   const { data } = useSession();
@@ -48,7 +49,7 @@ const Index: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
             <Space h="md" />
             <MessageInput />
             <Space h="md" />
-            <Group>
+            <Group className={styles.buttonControls}>
               <SendMessageButton />
               <ViewMessageButton />
             </Group>

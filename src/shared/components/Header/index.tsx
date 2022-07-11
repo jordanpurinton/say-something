@@ -1,22 +1,32 @@
-import { Header as MantineHeader, Text } from '@mantine/core';
-import Link from 'next/link';
+import {
+  Burger,
+  Header as MantineHeader,
+  MediaQuery,
+  Title,
+} from '@mantine/core';
 import React, { FC } from 'react';
 import styles from '../../styles/Header.module.scss';
-import Avatar from '../Avatar';
 
-export const Header: FC = () => {
+interface HeaderProps {
+  navbarIsOpen: boolean;
+  setNavbarIsOpen: (navbarIsOpen: boolean) => void;
+}
+
+export const Header: FC<HeaderProps> = ({ navbarIsOpen, setNavbarIsOpen }) => {
   return (
     <MantineHeader className={styles.header} height={60} p="xs">
-      <Link className={styles.headerButton} href="/">
-        <Text className={styles.headerLink}>Home</Text>
-      </Link>
-      <Link className={styles.headerButton} href="/send-history">
-        <Text className={styles.headerLink}>Send History</Text>
-      </Link>
-      <Link className={styles.headerButton} href="/view-history">
-        <Text className={styles.headerLink}>View History</Text>
-      </Link>
-      <Avatar />
+      <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
+        <MediaQuery largerThan="sm" styles={{ display: 'none' }}>
+          <Burger
+            opened={navbarIsOpen}
+            onClick={() => setNavbarIsOpen(!navbarIsOpen)}
+            size="sm"
+            color="white"
+            mr="xl"
+          />
+        </MediaQuery>
+        <Title order={2}>Say Something</Title>
+      </div>
     </MantineHeader>
   );
 };
