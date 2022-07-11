@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 import { Home, Message } from 'tabler-icons-react';
 import { ThemeIcon, UnstyledButton, Group, Text } from '@mantine/core';
 import Avatar from '../Avatar';
+import { useRouter } from 'next/router';
 
 interface NavBarLinkProps {
   icon: React.ReactNode;
@@ -18,9 +19,14 @@ const NavBarLink: FC<NavBarLinkProps> = ({
   url,
   setNavbarIsOpen,
 }: NavBarLinkProps) => {
+  const router = useRouter();
   const handleClick = () => {
     setNavbarIsOpen(false);
-    window.location.href = url;
+    if (label === 'Profile') {
+      window.location.href = url;
+    } else {
+      router.push(url);
+    }
   };
 
   return (
