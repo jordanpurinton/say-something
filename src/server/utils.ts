@@ -49,12 +49,9 @@ export const throwForbidden = () => {
 };
 
 export const getVerifiedToken = (
-  req: NextApiRequest
+  token: string | undefined
 ): JwtPayload | undefined => {
-  const verified = jwt.verify(
-    req.cookies.access_token || '',
-    process.env.NEXTAUTH_SECRET || ''
-  );
+  const verified = jwt.verify(token || '', process.env.NEXTAUTH_SECRET || '');
 
   if (!verified) throwUnauthorized();
 
@@ -87,6 +84,5 @@ export const clearCookies = (
     `${cookies[0]}=deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0`,
     `${cookies[1]}=deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0`,
     `${cookies[2]}=deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0`,
-    `${cookies[3]}=deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0`,
   ]);
 };

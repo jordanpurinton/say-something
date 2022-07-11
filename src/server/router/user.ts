@@ -2,12 +2,11 @@ import { z } from 'zod';
 import { prisma } from '../db/prisma';
 import { createRouter } from './context';
 import {
-  clearCookies,
   getServerSession,
   throwForbidden,
   throwServerError,
+  clearCookies,
 } from '../utils';
-import { cookies } from '../../shared/constants';
 
 export default createRouter()
   .mutation('create', {
@@ -123,11 +122,6 @@ export default createRouter()
         },
       });
 
-      ctx?.res.setHeader('Set-Cookie', [
-        `${cookies[0]}=deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0`,
-        `${cookies[1]}=deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0`,
-        `${cookies[2]}=deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0`,
-        `${cookies[3]}=deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0`,
-      ]);
+      clearCookies(ctx?.res);
     },
   });

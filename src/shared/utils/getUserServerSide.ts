@@ -25,9 +25,8 @@ export const getUserServerSide = async (
       res.writeHead(302, { Location: '/api/auth/signin' });
     }
 
-    res.setHeader('Set-Cookie', [`access_token=${data?.token}; path=/`]);
-
-    return superjson.serialize(data?.userProfile).json as SerializedUser;
+    return superjson.serialize({ ...data?.userProfile, token: data?.token })
+      .json as SerializedUser;
   } catch (err) {
     console.error(err);
     clearCookies(context.res);

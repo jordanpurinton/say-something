@@ -34,8 +34,10 @@ export const profileTableData = [
 ];
 
 export const cookies = [
-  'access_token',
   'next-auth.session-token',
   'next-auth.csrf-token',
   'next-auth.callback-url',
 ];
+
+export const DELETE_CONFIRMATION_TEXT =
+  'I understand, please delete my account';

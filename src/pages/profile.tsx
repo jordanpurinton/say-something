@@ -1,6 +1,17 @@
-import { Avatar, Button, Center, List, Space } from '@mantine/core';
+import {
+  Avatar,
+  Button,
+  Center,
+  Code,
+  Group,
+  Input,
+  List,
+  Modal,
+  Space,
+  Text,
+} from '@mantine/core';
 import type { NextApiRequest, NextApiResponse, NextPage } from 'next';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { ServerResponse } from 'http';
 import { useSession } from 'next-auth/react';
 import { SerializedUser } from '../shared/types';
@@ -8,24 +19,42 @@ import { useUser } from '../shared/context/UserContext';
 import { useSetInitUser } from '../shared/hooks/useSetInitUser';
 import { getUserServerSide } from '../shared/utils/getUserServerSide';
 import PageContainer from '../shared/containers/PageContainer';
-import { profileTableData } from '../shared/constants';
+import {
+  DELETE_CONFIRMATION_TEXT,
+  profileTableData,
+} from '../shared/constants';
 import { trpc } from '../shared/utils/trpc';
 import { useRouter } from 'next/router';
 import Loading from '../shared/components/Loading';
 import Head from 'next/head';
 import { Logout } from 'tabler-icons-react';
+import { appRouter } from '../server/router';
+import { createSSGHelpers } from '@trpc/react/ssg';
+import superjson from 'superjson';
+import { ChangeEvent } from 'react';
+import { signOut } from 'next-auth/react';
 
-const Profile: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
+const Profile: NextPage<{ messagesSent: number; userData: SerializedUser }> = ({
+  messagesSent,
+  userData,
+}) => {
   const { data } = useSession();
   const { user } = useUser();
   const router = useRouter();
+  const [opened, setOpened] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [deleteConfirmationText, setDeleteConfirmationText] = useState('');
+
   const setInitUser = useSetInitUser();
+
   const logoutUserMutation = trpc.useMutation(['user.log-out']);
   const deleteUserMutation = trpc.useMutation(['user.delete']);
 
-  const handleUserLogOut = useCallback(async () => {
+  const handleUserSignOut = useCallback(async () => {
+    setIsLoggingOut(true);
     await logoutUserMutation.mutateAsync();
-    router.reload();
+    await signOut({ redirect: false, callbackUrl: '/' });
+    router.replace('/api/auth/signin');
   }, [logoutUserMutation, router]);
 
   const handleDeleteUser = useCallback(async () => {
@@ -38,7 +67,7 @@ const Profile: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (!data || !user) {
+  if ((!data || !user) && !isLoggingOut) {
     return <Loading text="Fetching profile..." />;
   }
 
@@ -53,7 +82,7 @@ const Profile: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
           <List spacing="sm" size="sm">
             <Center>
               <Avatar
-                src={user.image}
+                src={user?.image}
                 alt={data?.user?.name || ''}
                 size="lg"
                 radius="xl"
@@ -65,30 +94,62 @@ const Profile: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
                 {obj.label}: {(user as any)[obj.key].toString()}
               </List.Item>
             ))}
+            <List.Item key="sent">Messages Sent: {messagesSent}</List.Item>
+            <List.Item key="viewed">
+              Messages Viewed by You:{' '}
+              {user?.viewedMessageIds.split(',').length || 0}
+            </List.Item>
           </List>
           <Space h="md" />
           <Space h="md" />
-          <Button
-            onClick={handleUserLogOut}
-            rightIcon={<Logout />}
-            loaderPosition="right"
-            size="lg"
-            variant="light"
-          >
-            Log Out
-          </Button>
-          <Space h="md" />
-          <Space h="md" />
-          <Button
-            onClick={handleDeleteUser}
-            loading={deleteUserMutation.isLoading}
-            loaderPosition="right"
-            size="lg"
-            color="red"
-            variant="light"
-          >
-            Delete
-          </Button>
+          <Group>
+            <Button
+              onClick={handleUserSignOut}
+              rightIcon={<Logout />}
+              loaderPosition="right"
+              size="lg"
+              variant="light"
+            >
+              Sign Out
+            </Button>
+            <Button
+              onClick={() => setOpened((prev) => !prev)}
+              loading={deleteUserMutation.isLoading}
+              loaderPosition="right"
+              size="lg"
+              color="red"
+              variant="light"
+            >
+              Delete
+            </Button>
+          </Group>
+          <Modal opened={opened} onClose={() => setOpened(false)} centered>
+            <Text>
+              Are you <b>sure</b> you want to delete your profile?
+              <Space h="md" />
+              All data associated with your account will be deleted.
+              <Space h="md" />
+              <Code color="red">
+                Enter &quot;<b>{DELETE_CONFIRMATION_TEXT}</b>&quot;
+              </Code>
+              <Space h="md" />
+              <Input
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setDeleteConfirmationText(e.target.value)
+                }
+              />
+              <Space h="md" />
+              <Button
+                onClick={handleDeleteUser}
+                disabled={deleteConfirmationText !== DELETE_CONFIRMATION_TEXT}
+                loading={deleteUserMutation.isLoading}
+                loaderPosition="right"
+                color="red"
+              >
+                {DELETE_CONFIRMATION_TEXT}
+              </Button>
+            </Text>
+          </Modal>
         </PageContainer>
       </main>
     </>
@@ -100,8 +161,18 @@ export async function getServerSideProps(context: {
   res: ServerResponse | NextApiResponse<any>;
 }) {
   const userData = await getUserServerSide(context);
+
+  const ssg = createSSGHelpers({
+    router: appRouter,
+    ctx: { ...context, prisma } as any,
+    transformer: superjson,
+  });
+
+  const res = await ssg.fetchQuery('message.find-by-user');
+  const messagesSent = res.messages.length;
+
   return {
-    props: { userData },
+    props: { trpcState: ssg.dehydrate(), messagesSent, userData },
   };
 }
 

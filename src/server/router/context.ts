@@ -2,13 +2,15 @@ import * as trpc from '@trpc/server';
 import * as trpcNext from '@trpc/server/adapters/next';
 import { prisma } from '../db/prisma';
 import { checkTokenExp, clearCookies, getVerifiedToken } from '../utils';
+import { getUserServerSide } from '../../shared/utils/getUserServerSide';
 
 export const createContext = async ({
   req,
   res,
 }: trpcNext.CreateNextContextOptions) => {
   try {
-    const verified = getVerifiedToken(req);
+    const session = await getUserServerSide({ req, res });
+    const verified = getVerifiedToken(session?.token);
     checkTokenExp(verified || undefined);
 
     return {
