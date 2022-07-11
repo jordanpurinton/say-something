@@ -34,10 +34,11 @@ import superjson from 'superjson';
 import { ChangeEvent } from 'react';
 import { signOut } from 'next-auth/react';
 
-const Profile: NextPage<{ messagesSent: number; userData: SerializedUser }> = ({
-  messagesSent,
-  userData,
-}) => {
+const Profile: NextPage<{
+  messagesSent: number;
+  messagesViewed: number;
+  userData: SerializedUser;
+}> = ({ messagesSent, messagesViewed, userData }) => {
   const { data } = useSession();
   const { user } = useUser();
   const router = useRouter();
@@ -94,10 +95,11 @@ const Profile: NextPage<{ messagesSent: number; userData: SerializedUser }> = ({
                 {obj.label}: {(user as any)[obj.key].toString()}
               </List.Item>
             ))}
-            <List.Item key="sent">Messages Sent: {messagesSent}</List.Item>
+            <List.Item key="sent">
+              Messages Sent by You: {messagesSent}
+            </List.Item>
             <List.Item key="viewed">
-              Messages Viewed by You:{' '}
-              {user?.viewedMessageIds.split(',').length || 0}
+              Messages Viewed by You: {messagesViewed}
             </List.Item>
           </List>
           <Space h="md" />
@@ -168,11 +170,19 @@ export async function getServerSideProps(context: {
     transformer: superjson,
   });
 
-  const res = await ssg.fetchQuery('message.find-by-user');
-  const messagesSent = res.messages.length;
+  const findByUserRes = await ssg.fetchQuery('message.find-by-user');
+  const findViewedRes = await ssg.fetchQuery('message.find-viewed-messages');
+
+  const messagesSent = findByUserRes.messages.length;
+  const messagesViewed = findViewedRes?.messages.length || 0;
 
   return {
-    props: { trpcState: ssg.dehydrate(), messagesSent, userData },
+    props: {
+      trpcState: ssg.dehydrate(),
+      messagesSent,
+      messagesViewed,
+      userData,
+    },
   };
 }
 

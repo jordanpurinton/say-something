@@ -38,7 +38,7 @@ model Session {
 }
 
 model Message {
-    id        Int      @id @default(autoincrement())
+    id        String   @id @default(cuid())
     createdAt DateTime @default(now())
     content   String   @db.VarChar(280)
     views     Int      @default(0)
@@ -58,7 +58,7 @@ model User {
     accounts                Account[]
     sessions                Session[]
     Message                 Message[]
-    viewedMessageIds        String    @default("")
+    viewedMessageIds        Json?     @default("{}")
     canViewMessageTimestamp DateTime  @default(now())
     canSendMessageTimestamp DateTime  @default(now())
 }

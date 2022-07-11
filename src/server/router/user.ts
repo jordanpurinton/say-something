@@ -16,6 +16,7 @@ export default createRouter()
       email: z.string(),
       emailVerified: z.date(),
       image: z.string(),
+      viewedMessageIds: z.object({}),
     }),
     async resolve({ input }) {
       const derived = {
