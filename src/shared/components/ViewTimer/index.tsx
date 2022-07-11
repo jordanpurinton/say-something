@@ -2,6 +2,7 @@ import { Center, Container, Space, Text } from '@mantine/core';
 import React, { FC, useMemo } from 'react';
 import { useUser } from '../../context/UserContext';
 import { useCountdown } from '../../hooks/useCountdown';
+import styles from '../../styles/Timer.module.scss';
 
 export const SendTimer: FC = () => {
   const { user } = useUser();
@@ -21,8 +22,8 @@ export const SendTimer: FC = () => {
         {isDisabled ? (
           <>
             You can view a message in <Space h="xs" />
-            <Center>
-              <Text weight="bold">
+            <Center className={styles.timer}>
+              <Text>
                 {hours}:{minutes}:{seconds}
               </Text>
             </Center>

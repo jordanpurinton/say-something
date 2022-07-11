@@ -32,3 +32,12 @@ export const profileTableData = [
     label: 'Can Send Message At',
   },
 ];
+
+export const cookies = [
+  'next-auth.session-token',
+  'next-auth.csrf-token',
+  'next-auth.callback-url',
+];
+
+export const DELETE_CONFIRMATION_TEXT =
+  'I understand, please delete my account';

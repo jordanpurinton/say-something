@@ -1,20 +1,27 @@
 import * as trpc from '@trpc/server';
 import * as trpcNext from '@trpc/server/adapters/next';
 import { prisma } from '../db/prisma';
-import { checkTokenExp, getVerifiedToken } from '../utils';
+import { checkTokenExp, clearCookies, getVerifiedToken } from '../utils';
+import { getUserServerSide } from '../../shared/utils/getUserServerSide';
 
 export const createContext = async ({
   req,
   res,
 }: trpcNext.CreateNextContextOptions) => {
-  const verified = getVerifiedToken(req);
-  checkTokenExp(verified || undefined);
+  try {
+    const session = await getUserServerSide({ req, res });
+    const verified = getVerifiedToken(session?.token);
+    checkTokenExp(verified || undefined);
 
-  return {
-    req,
-    res,
-    prisma,
-  };
+    return {
+      req,
+      res,
+      prisma,
+    };
+  } catch (err) {
+    console.error(err);
+    clearCookies(res);
+  }
 };
 
 type Context = trpc.inferAsyncReturnType<typeof createContext>;

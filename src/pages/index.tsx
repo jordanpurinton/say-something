@@ -1,4 +1,4 @@
-import { Space } from '@mantine/core';
+import { Group, Space } from '@mantine/core';
 import type { NextApiRequest, NextApiResponse, NextPage } from 'next';
 import Head from 'next/head';
 import React, { useEffect } from 'react';
@@ -11,7 +11,6 @@ import SendMessageButton from '../shared/components/SendMessageButton';
 import SendTimer from '../shared/components/SendTimer';
 import ViewMessageButton from '../shared/components/ViewMessageButton';
 import { AppProvider } from '../shared/context/AppContext';
-import styles from '../shared/styles/Index.module.scss';
 import { SerializedUser } from '../shared/types';
 import { useSetInitUser } from '../shared/hooks/useSetInitUser';
 import ViewTimer from '../shared/components/ViewTimer';
@@ -37,7 +36,7 @@ const Index: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
   return (
     <>
       <Head>
-        <title>Say Something</title>
+        <title>Say Something - Home</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
@@ -49,12 +48,14 @@ const Index: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
             <Space h="md" />
             <MessageInput />
             <Space h="md" />
-            <span className={styles.buttonControls}>
+            <Group>
               <SendMessageButton />
               <ViewMessageButton />
-            </span>
-            <SendTimer />
-            <ViewTimer />
+            </Group>
+            <Group>
+              <SendTimer />
+              <ViewTimer />
+            </Group>
           </PageContainer>
         </AppProvider>
       </main>

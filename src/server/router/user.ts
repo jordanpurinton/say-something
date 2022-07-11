@@ -1,7 +1,12 @@
 import { z } from 'zod';
 import { prisma } from '../db/prisma';
 import { createRouter } from './context';
-import { getServerSession, throwForbidden, throwServerError } from '../utils';
+import {
+  getServerSession,
+  throwForbidden,
+  throwServerError,
+  clearCookies,
+} from '../utils';
 
 export default createRouter()
   .mutation('create', {
@@ -11,6 +16,7 @@ export default createRouter()
       email: z.string(),
       emailVerified: z.date(),
       image: z.string(),
+      viewedMessageIds: z.object({}),
     }),
     async resolve({ input }) {
       const derived = {
@@ -101,6 +107,12 @@ export default createRouter()
       });
     },
   })
+  .mutation('log-out', {
+    async resolve({ ctx }) {
+      clearCookies(ctx?.res);
+      return { success: true };
+    },
+  })
   .mutation('delete', {
     async resolve({ ctx }) {
       const session = await getServerSession(ctx);
@@ -110,5 +122,7 @@ export default createRouter()
           id: session?.userProfile.id,
         },
       });
+
+      clearCookies(ctx?.res);
     },
   });

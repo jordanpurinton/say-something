@@ -1,4 +1,4 @@
-import { Message } from '@prisma/client';
+import { Message, Prisma } from '@prisma/client';
 import { z } from 'zod';
 import { prisma } from '../db/prisma';
 import { getServerSession, throwBadRequest, throwServerError } from '../utils';
@@ -32,7 +32,7 @@ export default createRouter()
   })
   .query('find', {
     input: z.object({
-      id: z.number(),
+      id: z.string(),
     }),
     async resolve({ input }) {
       const message = await prisma.message.findUnique({
@@ -84,19 +84,19 @@ export default createRouter()
         take: 1,
       });
 
-      const prevViewedMessageIds = user?.viewedMessageIds.split(',') || [];
-      const newViewedMessageIdsString = [
-        ...prevViewedMessageIds,
-        message?.id || '',
-      ].join(',');
+      const newViewedMessageIds = (user?.viewedMessageIds ||
+        {}) as Prisma.JsonObject;
+
+      if (message && !newViewedMessageIds?.hasOwnProperty(message.id)) {
+        newViewedMessageIds[message.id] = true;
+      }
+
       await prisma.user.update({
         where: {
           id: session?.userProfile.id,
         },
         data: {
-          viewedMessageIds: {
-            set: newViewedMessageIdsString,
-          },
+          viewedMessageIds: newViewedMessageIds,
         },
       });
 
@@ -105,7 +105,7 @@ export default createRouter()
   })
   .mutation('upvote-message', {
     input: z.object({
-      id: z.number(),
+      id: z.string(),
     }),
     async resolve({ ctx, input }) {
       const session = await getServerSession(ctx);
@@ -135,7 +135,7 @@ export default createRouter()
   })
   .mutation('downvote-message', {
     input: z.object({
-      id: z.number(),
+      id: z.string(),
     }),
     async resolve({ ctx, input }) {
       const session = await getServerSession(ctx);
@@ -165,7 +165,7 @@ export default createRouter()
   })
   .mutation('update-views', {
     input: z.object({
-      id: z.number(),
+      id: z.string(),
     }),
     async resolve({ input }) {
       const message = await prisma.message.findUnique({
@@ -198,35 +198,35 @@ export default createRouter()
         },
       });
 
-      const viewedMessageIds = Array.from(
-        new Set(
-          user?.viewedMessageIds
-            .split(',')
-            .map((id) => {
-              const parsedId = parseInt(id) || -1;
-              if (isNaN(parsedId)) {
-                return;
-              }
-              if (!isNaN(parsedId) && parsedId > -1) return parsedId;
-            })
-            .filter((id) => !!id)
-        )
-      );
+      if (
+        user?.viewedMessageIds &&
+        typeof user?.viewedMessageIds === 'object'
+      ) {
+        let viewedMessageIdsObj = user?.viewedMessageIds;
 
-      let messagesToReturn: Message[] = [];
+        let viewedMessageIds: string[] = [];
 
-      if (viewedMessageIds.length > 0) {
-        messagesToReturn = await prisma.message.findMany({
-          where: {
-            id: {
-              in: (viewedMessageIds as []) || [],
+        if (viewedMessageIdsObj) {
+          viewedMessageIds = Object.keys(
+            viewedMessageIdsObj as Prisma.JsonObject
+          );
+        }
+
+        let messagesToReturn: Message[] = [];
+
+        if (viewedMessageIds.length > 0) {
+          messagesToReturn = await prisma.message.findMany({
+            where: {
+              id: {
+                in: (viewedMessageIds as []) || [],
+              },
             },
-          },
-        });
-      } else if (viewedMessageIds.length === 0) {
-        return { success: true, messages: [] };
-      }
+          });
+        } else if (viewedMessageIds.length === 0) {
+          return { success: true, messages: [] };
+        }
 
-      return { success: true, messages: messagesToReturn || [] };
+        return { success: true, messages: messagesToReturn || [] };
+      }
     },
   });
