@@ -1,5 +1,4 @@
 import { Space } from '@mantine/core';
-import { Message } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse, NextPage } from 'next';
 import Head from 'next/head';
 import React, { useEffect } from 'react';
@@ -14,12 +13,14 @@ import { useSetInitUser } from '../shared/hooks/useSetInitUser';
 import { getUserServerSide } from '../shared/utils/getUserServerSide';
 import MessageCount from '../shared/components/MessageCount';
 import Loading from '../shared/components/Loading';
+import { useSentMessages } from '../shared/context/AppContext';
 
 const SendHistory: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
   const { data } = useSession();
   const { user } = useUser();
   const setInitUser = useSetInitUser();
-  const [sentMessages, setSentMessages] = React.useState<Message[]>([]);
+  const { sentMessages, setSentMessages } = useSentMessages();
+
   const findMessagesByUserQuery = trpc.useQuery(['message.find-by-user'], {
     enabled: false,
   });
@@ -28,7 +29,8 @@ const SendHistory: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
     setInitUser(userData);
     const fetchMessageData = async () => {
       const messageData = await findMessagesByUserQuery.refetch();
-      setSentMessages(messageData?.data?.messages || []);
+      const newMessages = messageData?.data?.messages || [];
+      setSentMessages(newMessages);
     };
     fetchMessageData();
     // eslint-disable-next-line react-hooks/exhaustive-deps

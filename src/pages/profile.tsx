@@ -11,9 +11,9 @@ import {
   Text,
 } from '@mantine/core';
 import type { NextApiRequest, NextApiResponse, NextPage } from 'next';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { ChangeEvent, useCallback, useEffect, useState } from 'react';
 import { ServerResponse } from 'http';
-import { useSession } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 import { SerializedUser } from '../shared/types';
 import { useUser } from '../shared/context/UserContext';
 import { useSetInitUser } from '../shared/hooks/useSetInitUser';
@@ -28,18 +28,10 @@ import { useRouter } from 'next/router';
 import Loading from '../shared/components/Loading';
 import Head from 'next/head';
 import { Logout } from 'tabler-icons-react';
-import { appRouter } from '../server/router';
-import { createSSGHelpers } from '@trpc/react/ssg';
-import superjson from 'superjson';
-import { ChangeEvent } from 'react';
-import { signOut } from 'next-auth/react';
-import { prisma } from '../server/db/prisma';
 
 const Profile: NextPage<{
-  messagesSent: number;
-  messagesViewed: number;
   userData: SerializedUser;
-}> = ({ messagesSent, messagesViewed, userData }) => {
+}> = ({ userData }) => {
   const { data } = useSession();
   const { user } = useUser();
   const router = useRouter();
@@ -49,6 +41,12 @@ const Profile: NextPage<{
 
   const setInitUser = useSetInitUser();
 
+  const findByUserQuery = trpc.useQuery(['message.find-by-user'], {
+    enabled: false,
+  });
+  const findViewedQuery = trpc.useQuery(['message.find-viewed-messages'], {
+    enabled: false,
+  });
   const logoutUserMutation = trpc.useMutation(['user.log-out']);
   const deleteUserMutation = trpc.useMutation(['user.delete']);
 
@@ -66,10 +64,18 @@ const Profile: NextPage<{
 
   useEffect(() => {
     setInitUser(userData);
+    findByUserQuery.refetch();
+    findViewedQuery.refetch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if ((!data || !user) && !isLoggingOut) {
+  if (
+    (!data ||
+      !user ||
+      findByUserQuery.isLoading ||
+      findViewedQuery.isLoading) &&
+    !isLoggingOut
+  ) {
     return <Loading text="Fetching profile..." />;
   }
 
@@ -97,10 +103,10 @@ const Profile: NextPage<{
               </List.Item>
             ))}
             <List.Item key="sent">
-              Messages Sent by You: {messagesSent}
+              Messages Sent by You: {findByUserQuery.data?.messages.length}
             </List.Item>
             <List.Item key="viewed">
-              Messages Viewed by You: {messagesViewed}
+              Messages Viewed by You: {findViewedQuery.data?.messages.length}
             </List.Item>
           </List>
           <Space h="md" />
@@ -165,23 +171,8 @@ export async function getServerSideProps(context: {
 }) {
   const userData = await getUserServerSide(context);
 
-  const ssg = createSSGHelpers({
-    router: appRouter,
-    ctx: { ...context, prisma } as any,
-    transformer: superjson,
-  });
-
-  const findByUserRes = await ssg.fetchQuery('message.find-by-user');
-  const findViewedRes = await ssg.fetchQuery('message.find-viewed-messages');
-
-  const messagesSent = findByUserRes.messages.length;
-  const messagesViewed = findViewedRes?.messages.length || 0;
-
   return {
     props: {
-      trpcState: ssg.dehydrate(),
-      messagesSent,
-      messagesViewed,
       userData,
     },
   };

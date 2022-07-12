@@ -1,3 +1,4 @@
+import { Message } from '@prisma/client';
 import React, {
   createContext,
   Dispatch,
@@ -14,6 +15,10 @@ interface AppState {
   setNickname: Dispatch<SetStateAction<string>>;
   viewMessageModalIsOpen: boolean;
   setViewMessageModalIsOpen: Dispatch<SetStateAction<boolean>>;
+  sentMessages: Message[];
+  setSentMessages: Dispatch<SetStateAction<Message[]>>;
+  viewedMessages: Message[];
+  setViewedMessages: Dispatch<SetStateAction<Message[]>>;
 }
 
 const AppContext = createContext<AppState>({
@@ -23,6 +28,10 @@ const AppContext = createContext<AppState>({
   setNickname: () => {},
   viewMessageModalIsOpen: false,
   setViewMessageModalIsOpen: () => {},
+  sentMessages: [],
+  setSentMessages: () => {},
+  viewedMessages: [],
+  setViewedMessages: () => {},
 });
 
 export const AppProvider = (props: any) => {
@@ -31,6 +40,8 @@ export const AppProvider = (props: any) => {
   const [nickname, setNickname] = useState<string>('');
   const [viewMessageModalIsOpen, setViewMessageModalIsOpen] =
     useState<boolean>(false);
+  const [sentMessages, setSentMessages] = useState<Message[]>([]);
+  const [viewedMessages, setViewedMessages] = useState<Message[]>([]);
 
   const memoizedProviderValues = useMemo(
     () => ({
@@ -40,8 +51,23 @@ export const AppProvider = (props: any) => {
       setNickname,
       viewMessageModalIsOpen,
       setViewMessageModalIsOpen,
+      sentMessages,
+      setSentMessages,
+      viewedMessages,
+      setViewedMessages,
     }),
-    [messageContent, nickname, viewMessageModalIsOpen]
+    [
+      messageContent,
+      setMessageContent,
+      nickname,
+      setNickname,
+      viewMessageModalIsOpen,
+      setViewMessageModalIsOpen,
+      sentMessages,
+      setSentMessages,
+      viewedMessages,
+      setViewedMessages,
+    ]
   );
 
   return (
@@ -65,4 +91,14 @@ export const useViewMessageModalIsOpen = () => {
   const { viewMessageModalIsOpen, setViewMessageModalIsOpen } =
     useContext(AppContext);
   return { viewMessageModalIsOpen, setViewMessageModalIsOpen };
+};
+
+export const useSentMessages = () => {
+  const { sentMessages, setSentMessages } = useContext(AppContext);
+  return { sentMessages, setSentMessages };
+};
+
+export const useViewedMessages = () => {
+  const { viewedMessages, setViewedMessages } = useContext(AppContext);
+  return { viewedMessages, setViewedMessages };
 };

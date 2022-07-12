@@ -10,7 +10,6 @@ import Nickname from '../shared/components/Nickname';
 import SendMessageButton from '../shared/components/SendMessageButton';
 import SendTimer from '../shared/components/SendTimer';
 import ViewMessageButton from '../shared/components/ViewMessageButton';
-import { AppProvider } from '../shared/context/AppContext';
 import { SerializedUser } from '../shared/types';
 import { useSetInitUser } from '../shared/hooks/useSetInitUser';
 import ViewTimer from '../shared/components/ViewTimer';
@@ -41,24 +40,22 @@ const Index: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <AppProvider>
-          <PageContainer>
-            <Greeting />
-            <Space h="md" />
-            <Nickname />
-            <Space h="md" />
-            <MessageInput />
-            <Space h="md" />
-            <Group className={styles.buttonControls}>
-              <SendMessageButton />
-              <ViewMessageButton />
-            </Group>
-            <Group>
-              <SendTimer />
-              <ViewTimer />
-            </Group>
-          </PageContainer>
-        </AppProvider>
+        <PageContainer>
+          <Greeting />
+          <Space h="md" />
+          <Nickname />
+          <Space h="md" />
+          <MessageInput />
+          <Space h="md" />
+          <Group className={styles.buttonControls}>
+            <SendMessageButton />
+            <ViewMessageButton />
+          </Group>
+          <Group>
+            <SendTimer />
+            <ViewTimer />
+          </Group>
+        </PageContainer>
       </main>
     </>
   );

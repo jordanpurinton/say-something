@@ -22,11 +22,7 @@ const NavBarLink: FC<NavBarLinkProps> = ({
   const router = useRouter();
   const handleClick = () => {
     setNavbarIsOpen(false);
-    if (label === 'Profile') {
-      window.location.href = url;
-    } else {
-      router.push(url);
-    }
+    router.push(url);
   };
 
   return (
@@ -50,7 +46,7 @@ const NavBarLink: FC<NavBarLinkProps> = ({
     >
       <Group>
         {label !== 'Profile' ? (
-          <ThemeIcon color={color} size="lg" variant="light">
+          <ThemeIcon color={color} size="xl" variant="light">
             {icon}
           </ThemeIcon>
         ) : (
@@ -62,7 +58,12 @@ const NavBarLink: FC<NavBarLinkProps> = ({
   );
 };
 
-const data = [
+const data: {
+  icon: JSX.Element;
+  color: string;
+  label: string;
+  url: string;
+}[] = [
   { icon: <Home size={16} />, color: 'blue', label: 'Home', url: '/' },
   {
     icon: <Message size={16} />,

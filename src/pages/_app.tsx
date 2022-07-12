@@ -11,6 +11,7 @@ import Header from '../shared/components/Header';
 import { UserProvider } from '../shared/context/UserContext';
 import '../shared/styles/globals.css';
 import Navbar from '../shared/components/Navbar';
+import { AppProvider } from '../shared/context/AppContext';
 
 const App: AppType = ({ Component, pageProps: { session, ...pageProps } }) => {
   const [navbarIsOpen, setNavbarIsOpen] = React.useState(false);
@@ -33,30 +34,32 @@ const App: AppType = ({ Component, pageProps: { session, ...pageProps } }) => {
         }}
       >
         <SessionProvider session={session}>
-          <UserProvider>
-            <NotificationsProvider>
-              <AppShell
-                padding="md"
-                navbarOffsetBreakpoint="sm"
-                asideOffsetBreakpoint="sm"
-                fixed
-                header={
-                  <Header
-                    navbarIsOpen={navbarIsOpen}
-                    setNavbarIsOpen={setNavbarIsOpen}
-                  />
-                }
-                navbar={
-                  <Navbar
-                    navbarIsOpen={navbarIsOpen}
-                    setNavbarIsOpen={setNavbarIsOpen}
-                  />
-                }
-              >
-                <Component {...pageProps} />
-              </AppShell>
-            </NotificationsProvider>
-          </UserProvider>
+          <AppProvider>
+            <UserProvider>
+              <NotificationsProvider>
+                <AppShell
+                  padding="md"
+                  navbarOffsetBreakpoint="sm"
+                  asideOffsetBreakpoint="sm"
+                  fixed
+                  header={
+                    <Header
+                      navbarIsOpen={navbarIsOpen}
+                      setNavbarIsOpen={setNavbarIsOpen}
+                    />
+                  }
+                  navbar={
+                    <Navbar
+                      navbarIsOpen={navbarIsOpen}
+                      setNavbarIsOpen={setNavbarIsOpen}
+                    />
+                  }
+                >
+                  <Component {...pageProps} />
+                </AppShell>
+              </NotificationsProvider>
+            </UserProvider>
+          </AppProvider>
         </SessionProvider>
       </MantineProvider>
     </>

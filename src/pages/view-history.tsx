@@ -1,5 +1,4 @@
 import { Space } from '@mantine/core';
-import { Message } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse, NextPage } from 'next';
 import Head from 'next/head';
 import React, { Fragment, useEffect } from 'react';
@@ -14,12 +13,14 @@ import { useSetInitUser } from '../shared/hooks/useSetInitUser';
 import { getUserServerSide } from '../shared/utils/getUserServerSide';
 import MessageCount from '../shared/components/MessageCount';
 import Loading from '../shared/components/Loading';
+import { useViewedMessages } from '../shared/context/AppContext';
 
 const ViewHistory: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
   const { data } = useSession();
   const { user } = useUser();
   const setInitUser = useSetInitUser();
-  const [viewedMessages, setViewedMessages] = React.useState<Message[]>([]);
+  const { viewedMessages, setViewedMessages } = useViewedMessages();
+
   const findViewedMessagesQuery = trpc.useQuery(
     ['message.find-viewed-messages'],
     {
@@ -31,7 +32,8 @@ const ViewHistory: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
     setInitUser(userData);
     const fetchMessageData = async () => {
       const messageData = await findViewedMessagesQuery.refetch();
-      setViewedMessages(messageData?.data?.messages || []);
+      const newMessages = messageData?.data?.messages || [];
+      setViewedMessages(newMessages);
     };
     fetchMessageData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
