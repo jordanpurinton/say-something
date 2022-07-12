@@ -16,7 +16,7 @@ import { trpc } from '../../utils/trpc';
 export const SendMessageButton: FC = () => {
   const { user, setUser } = useUser();
   const { messageContent, setMessageContent } = useMessageContent();
-  const { nickname } = useNickname();
+  const { nickname, setNickname } = useNickname();
   const { isProfaneInput } = useIsProfaneInput();
 
   const createMessageMutation = trpc.useMutation('message.create');
@@ -53,6 +53,9 @@ export const SendMessageButton: FC = () => {
     const newDate = new Date();
     newDate.setDate(newDate.getDate() + 1);
 
+    setMessageContent('');
+    setNickname('');
+
     createMessageMutation.mutateAsync({
       content: messageContent,
       nickname: nickname || DEFAULT_NICKNAME,
@@ -65,21 +68,21 @@ export const SendMessageButton: FC = () => {
 
     const newUserData = await findUserQuery.refetch();
     setUser(newUserData.data?.user as User);
-    setMessageContent('');
 
     showNotification({
       title: 'Nice',
       message: 'Message was sent',
     });
   }, [
-    messageContent,
     createMessageMutation,
+    messageContent,
     nickname,
     updateCanSendMessageTimestampMutation,
     user?.id,
     findUserQuery,
     setUser,
     setMessageContent,
+    setNickname,
   ]);
 
   // TODO: fix disabled not updating when user countdown expires
