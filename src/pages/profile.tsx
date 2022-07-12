@@ -99,14 +99,16 @@ const Profile: NextPage<{
             <Space h="md" />
             {profileTableData.map((obj) => (
               <List.Item key={obj.key}>
-                {obj.label}: {(user as any)[obj.key].toString()}
+                <b>{obj.label}</b>: {(user as any)[obj.key].toString()}
               </List.Item>
             ))}
             <List.Item key="sent">
-              Messages Sent by You: {findByUserQuery.data?.messages.length}
+              <b>Messages Sent by You</b>:{' '}
+              {findByUserQuery.data?.messages.length} messages
             </List.Item>
             <List.Item key="viewed">
-              Messages Viewed by You: {findViewedQuery.data?.messages.length}
+              <b>Messages Viewed by You</b>:{' '}
+              {findViewedQuery.data?.messages.length} messages
             </List.Item>
           </List>
           <Space h="md" />

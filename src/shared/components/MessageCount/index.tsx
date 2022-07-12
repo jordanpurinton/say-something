@@ -1,16 +1,17 @@
-import { Container, Text } from '@mantine/core';
+import { Container, Title } from '@mantine/core';
 import { FC } from 'react';
 
 interface MessageCountProps {
   count: number;
+  type: string;
 }
 
-export const MessageCount: FC<MessageCountProps> = ({ count }) => {
+export const MessageCount: FC<MessageCountProps> = ({ count, type }) => {
   return (
     <Container>
-      <Text>
-        Showing {count} message{count !== 1 ? 's' : ''}
-      </Text>
+      <Title order={3}>
+        Showing {count} {type} message{count !== 1 ? 's' : ''}
+      </Title>
     </Container>
   );
 };

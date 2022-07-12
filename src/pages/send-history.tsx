@@ -48,7 +48,7 @@ const SendHistory: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
       </Head>
       <main>
         <PageContainer>
-          <MessageCount count={sentMessages.length} />
+          <MessageCount count={sentMessages.length} type="sent" />
           {sentMessages.map((message) => (
             <Fragment key={message.id}>
               <MessageCard message={message} readonly={true} />

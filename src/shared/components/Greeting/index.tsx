@@ -3,7 +3,7 @@ import React, { FC } from 'react';
 
 export const Greeting: FC = () => (
   <>
-    <Title order={2}>Howdy,</Title>
+    <Title order={3}>Howdy,</Title>
     <Text>say something...</Text>
   </>
 );
