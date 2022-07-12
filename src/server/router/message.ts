@@ -82,7 +82,7 @@ export default createRouter()
       }
 
       const messageArray: Message[] = await prisma.$queryRaw(
-        Prisma.sql`SELECT * FROM Message ORDER BY RAND() LIMIT 1;`
+        Prisma.sql`SELECT * FROM Message WHERE userId <> ${user?.id} ORDER BY RAND() LIMIT 1;`
       );
 
       const message = messageArray[0];
