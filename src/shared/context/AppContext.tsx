@@ -21,6 +21,8 @@ interface AppState {
   setViewedMessages: Dispatch<SetStateAction<Message[]>>;
   isProfaneInput: boolean;
   setIsProfaneInput: Dispatch<SetStateAction<boolean>>;
+  isProfaneNickname: boolean;
+  setIsProfaneNickname: Dispatch<SetStateAction<boolean>>;
 }
 
 const AppContext = createContext<AppState>({
@@ -36,6 +38,8 @@ const AppContext = createContext<AppState>({
   setViewedMessages: () => {},
   isProfaneInput: false,
   setIsProfaneInput: () => {},
+  isProfaneNickname: false,
+  setIsProfaneNickname: () => {},
 });
 
 export const AppProvider = (props: any) => {
@@ -47,6 +51,7 @@ export const AppProvider = (props: any) => {
   const [sentMessages, setSentMessages] = useState<Message[]>([]);
   const [viewedMessages, setViewedMessages] = useState<Message[]>([]);
   const [isProfaneInput, setIsProfaneInput] = useState<boolean>(false);
+  const [isProfaneNickname, setIsProfaneNickname] = useState<boolean>(false);
 
   const memoizedProviderValues = useMemo(
     () => ({
@@ -62,6 +67,8 @@ export const AppProvider = (props: any) => {
       setViewedMessages,
       isProfaneInput,
       setIsProfaneInput,
+      isProfaneNickname,
+      setIsProfaneNickname,
     }),
     [
       messageContent,
@@ -76,6 +83,8 @@ export const AppProvider = (props: any) => {
       setViewedMessages,
       isProfaneInput,
       setIsProfaneInput,
+      isProfaneNickname,
+      setIsProfaneNickname,
     ]
   );
 
@@ -115,4 +124,9 @@ export const useViewedMessages = () => {
 export const useIsProfaneInput = () => {
   const { isProfaneInput, setIsProfaneInput } = useContext(AppContext);
   return { isProfaneInput, setIsProfaneInput };
+};
+
+export const useIsProfaneNickname = () => {
+  const { isProfaneNickname, setIsProfaneNickname } = useContext(AppContext);
+  return { isProfaneNickname, setIsProfaneNickname };
 };

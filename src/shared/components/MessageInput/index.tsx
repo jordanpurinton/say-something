@@ -13,6 +13,7 @@ export const MessageInput: FC = () => {
   const { isProfaneInput, setIsProfaneInput } = useIsProfaneInput();
 
   const filter = useMemo(() => new Filter(), []);
+
   const shouldDisable = useMemo(
     () => isAfter(user?.canSendMessageTimestamp as Date, new Date()),
     [user]

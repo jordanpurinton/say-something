@@ -7,6 +7,7 @@ import { Message } from 'tabler-icons-react';
 import { DEFAULT_NICKNAME } from '../../constants';
 import {
   useIsProfaneInput,
+  useIsProfaneNickname,
   useMessageContent,
   useNickname,
 } from '../../context/AppContext';
@@ -18,6 +19,7 @@ export const SendMessageButton: FC = () => {
   const { messageContent, setMessageContent } = useMessageContent();
   const { nickname, setNickname } = useNickname();
   const { isProfaneInput } = useIsProfaneInput();
+  const { isProfaneNickname } = useIsProfaneNickname();
 
   const createMessageMutation = trpc.useMutation('message.create');
   const updateCanSendMessageTimestampMutation = trpc.useMutation(
@@ -40,12 +42,14 @@ export const SendMessageButton: FC = () => {
       messageContent.trim().length === 0 ||
       isAfter(user?.canSendMessageTimestamp as Date, new Date()) ||
       updateCanSendMessageTimestampMutation.isLoading ||
-      isProfaneInput,
+      isProfaneInput ||
+      isProfaneNickname,
     [
       messageContent,
       user?.canSendMessageTimestamp,
       updateCanSendMessageTimestampMutation.isLoading,
       isProfaneInput,
+      isProfaneNickname,
     ]
   );
 

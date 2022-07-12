@@ -31,6 +31,10 @@ export default createRouter()
         return throwBadRequest('Content is profane. Please be nice.');
       }
 
+      if (filter.isProfane(nickname)) {
+        return throwBadRequest('Nickname is profane. Please be nice.');
+      }
+
       await prisma.message.create({
         data: { content, userId: sessionId as string, nickname },
       });
