@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 
 // https://blog.greenroots.info/how-to-create-a-countdown-timer-using-react-hooks
 
-// function that pads a number with a leading zero
 const padWithZero = (value: number): string =>
   value < 10 ? `0${value}` : value.toString();
 
