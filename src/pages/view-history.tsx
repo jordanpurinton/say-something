@@ -54,7 +54,7 @@ const ViewHistory: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
           <MessageCount count={viewedMessages.length} />
           {viewedMessages.map((message) => (
             <Fragment key={message.id}>
-              <MessageCard key={message.id} message={message} readonly={true} />
+              <MessageCard message={message} readonly={true} />
               <Space h="md" />
             </Fragment>
           ))}

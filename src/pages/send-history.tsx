@@ -1,7 +1,7 @@
 import { Space } from '@mantine/core';
 import type { NextApiRequest, NextApiResponse, NextPage } from 'next';
 import Head from 'next/head';
-import React, { useEffect } from 'react';
+import React, { Fragment, useEffect } from 'react';
 import { ServerResponse } from 'http';
 import { useSession } from 'next-auth/react';
 import { SerializedUser } from '../shared/types';
@@ -50,10 +50,10 @@ const SendHistory: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
         <PageContainer>
           <MessageCount count={sentMessages.length} />
           {sentMessages.map((message) => (
-            <>
-              <MessageCard key={message.id} message={message} readonly={true} />
+            <Fragment key={message.id}>
+              <MessageCard message={message} readonly={true} />
               <Space h="md" />
-            </>
+            </Fragment>
           ))}
         </PageContainer>
       </main>
