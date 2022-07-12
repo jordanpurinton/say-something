@@ -19,6 +19,8 @@ interface AppState {
   setSentMessages: Dispatch<SetStateAction<Message[]>>;
   viewedMessages: Message[];
   setViewedMessages: Dispatch<SetStateAction<Message[]>>;
+  isProfaneInput: boolean;
+  setIsProfaneInput: Dispatch<SetStateAction<boolean>>;
 }
 
 const AppContext = createContext<AppState>({
@@ -32,6 +34,8 @@ const AppContext = createContext<AppState>({
   setSentMessages: () => {},
   viewedMessages: [],
   setViewedMessages: () => {},
+  isProfaneInput: false,
+  setIsProfaneInput: () => {},
 });
 
 export const AppProvider = (props: any) => {
@@ -42,6 +46,7 @@ export const AppProvider = (props: any) => {
     useState<boolean>(false);
   const [sentMessages, setSentMessages] = useState<Message[]>([]);
   const [viewedMessages, setViewedMessages] = useState<Message[]>([]);
+  const [isProfaneInput, setIsProfaneInput] = useState<boolean>(false);
 
   const memoizedProviderValues = useMemo(
     () => ({
@@ -55,6 +60,8 @@ export const AppProvider = (props: any) => {
       setSentMessages,
       viewedMessages,
       setViewedMessages,
+      isProfaneInput,
+      setIsProfaneInput,
     }),
     [
       messageContent,
@@ -67,6 +74,8 @@ export const AppProvider = (props: any) => {
       setSentMessages,
       viewedMessages,
       setViewedMessages,
+      isProfaneInput,
+      setIsProfaneInput,
     ]
   );
 
@@ -101,4 +110,9 @@ export const useSentMessages = () => {
 export const useViewedMessages = () => {
   const { viewedMessages, setViewedMessages } = useContext(AppContext);
   return { viewedMessages, setViewedMessages };
+};
+
+export const useIsProfaneInput = () => {
+  const { isProfaneInput, setIsProfaneInput } = useContext(AppContext);
+  return { isProfaneInput, setIsProfaneInput };
 };

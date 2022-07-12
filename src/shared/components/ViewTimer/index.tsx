@@ -18,20 +18,11 @@ export const SendTimer: FC = () => {
   return (
     <Container>
       <Space h="md" />
-      <Text>
-        {isDisabled ? (
-          <>
-            You can view a message in <Space h="xs" />
-            <Center className={styles.timer}>
-              <Text>
-                {hours}:{minutes}:{seconds}
-              </Text>
-            </Center>
-          </>
-        ) : (
-          <>You have a pending message available to view.</>
-        )}
-      </Text>
+      You can view a message {isDisabled ? 'in' : ''}
+      <Space h="xs" />
+      <Center className={styles.timer}>
+        <Text>{isDisabled ? `${hours}:${minutes}:${seconds}` : 'NOW'}</Text>
+      </Center>
     </Container>
   );
 };

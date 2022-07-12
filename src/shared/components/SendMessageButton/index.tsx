@@ -5,7 +5,11 @@ import { isAfter } from 'date-fns';
 import React, { FC, useCallback, useMemo } from 'react';
 import { Message } from 'tabler-icons-react';
 import { DEFAULT_NICKNAME } from '../../constants';
-import { useMessageContent, useNickname } from '../../context/AppContext';
+import {
+  useIsProfaneInput,
+  useMessageContent,
+  useNickname,
+} from '../../context/AppContext';
 import { useUser } from '../../context/UserContext';
 import { trpc } from '../../utils/trpc';
 
@@ -13,6 +17,7 @@ export const SendMessageButton: FC = () => {
   const { user, setUser } = useUser();
   const { messageContent, setMessageContent } = useMessageContent();
   const { nickname } = useNickname();
+  const { isProfaneInput } = useIsProfaneInput();
 
   const createMessageMutation = trpc.useMutation('message.create');
   const updateCanSendMessageTimestampMutation = trpc.useMutation(
@@ -34,11 +39,13 @@ export const SendMessageButton: FC = () => {
     () =>
       messageContent.trim().length === 0 ||
       isAfter(user?.canSendMessageTimestamp as Date, new Date()) ||
-      updateCanSendMessageTimestampMutation.isLoading,
+      updateCanSendMessageTimestampMutation.isLoading ||
+      isProfaneInput,
     [
       messageContent,
       user?.canSendMessageTimestamp,
       updateCanSendMessageTimestampMutation.isLoading,
+      isProfaneInput,
     ]
   );
 
@@ -65,17 +72,17 @@ export const SendMessageButton: FC = () => {
       message: 'Message was sent',
     });
   }, [
-    createMessageMutation,
     messageContent,
-    user?.id,
+    createMessageMutation,
     nickname,
     updateCanSendMessageTimestampMutation,
+    user?.id,
     findUserQuery,
     setUser,
     setMessageContent,
   ]);
 
-  // todo: fix disabled not updating when user countdown expires
+  // TODO: fix disabled not updating when user countdown expires
   return (
     <Button
       disabled={shouldDisable}

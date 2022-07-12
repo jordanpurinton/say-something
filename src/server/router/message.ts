@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { prisma } from '../db/prisma';
 import { getServerSession, throwBadRequest, throwServerError } from '../utils';
 import { createRouter } from './context';
+import Filter from 'bad-words';
 
 export default createRouter()
   .mutation('create', {
@@ -14,6 +15,7 @@ export default createRouter()
       const { content, nickname } = input;
       const session = await getServerSession(ctx);
       const sessionId = session?.userProfile.id;
+      const filter = new Filter();
 
       const user = await prisma.user.findUnique({
         where: {
@@ -23,6 +25,10 @@ export default createRouter()
 
       if ((user?.canSendMessageTimestamp || -1) > new Date()) {
         return throwBadRequest('canSendMessageTimestamp must be in the past');
+      }
+
+      if (filter.isProfane(content)) {
+        return throwBadRequest('Content is profane. Please be nice.');
       }
 
       await prisma.message.create({
