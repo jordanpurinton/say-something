@@ -81,14 +81,11 @@ export default createRouter()
         return throwBadRequest('canViewMessageTimestamp must be in the past');
       }
 
-      const message = await prisma.message.findFirst({
-        where: {
-          userId: {
-            not: session?.userProfile.id,
-          },
-        },
-        take: 1,
-      });
+      const messageArray: Message[] = await prisma.$queryRaw(
+        Prisma.sql`SELECT * FROM Message ORDER BY RAND() LIMIT 1;`
+      );
+
+      const message = messageArray[0];
 
       const newViewedMessageIds = (user?.viewedMessageIds ||
         {}) as Prisma.JsonObject;
