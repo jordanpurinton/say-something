@@ -28,12 +28,12 @@ export const Header: FC<HeaderProps> = ({ navbarIsOpen, setNavbarIsOpen }) => {
             mr="xl"
           />
         </MediaQuery>
-        <Title order={2}>
-          Say Something
-          {isChangingPage && (
-            <Loader style={{ position: 'absolute' }} color="white" />
-          )}
-        </Title>
+        <Title order={2}>Say Something</Title>
+        {!isChangingPage && (
+          <div style={{ marginLeft: '1em', marginTop: '0.55em' }}>
+            <Loader color="white" />
+          </div>
+        )}
       </div>
     </MantineHeader>
   );
