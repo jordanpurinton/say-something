@@ -40,7 +40,9 @@ export const SendTimer: FC = () => {
       You can view a message {isDisabled ? 'in' : ''}
       <Space h="xs" />
       <Center className={styles.timer}>
-        <Text>{isDisabled ? `${hours}:${minutes}:${seconds}` : 'NOW'}</Text>
+        <Text>
+          {isDisabled ? `${hours}:${minutes}:${seconds}` : <b>NOW</b>}
+        </Text>
       </Center>
     </Container>
   );
