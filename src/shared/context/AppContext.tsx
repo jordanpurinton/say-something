@@ -23,6 +23,8 @@ interface AppState {
   setIsProfaneInput: Dispatch<SetStateAction<boolean>>;
   isProfaneNickname: boolean;
   setIsProfaneNickname: Dispatch<SetStateAction<boolean>>;
+  isChangingPage: boolean;
+  setIsChangingPage: Dispatch<SetStateAction<boolean>>;
 }
 
 const AppContext = createContext<AppState>({
@@ -40,6 +42,8 @@ const AppContext = createContext<AppState>({
   setIsProfaneInput: () => {},
   isProfaneNickname: false,
   setIsProfaneNickname: () => {},
+  isChangingPage: false,
+  setIsChangingPage: () => {},
 });
 
 export const AppProvider = (props: any) => {
@@ -52,6 +56,7 @@ export const AppProvider = (props: any) => {
   const [viewedMessages, setViewedMessages] = useState<Message[]>([]);
   const [isProfaneInput, setIsProfaneInput] = useState<boolean>(false);
   const [isProfaneNickname, setIsProfaneNickname] = useState<boolean>(false);
+  const [isChangingPage, setIsChangingPage] = useState<boolean>(false);
 
   const memoizedProviderValues = useMemo(
     () => ({
@@ -69,6 +74,8 @@ export const AppProvider = (props: any) => {
       setIsProfaneInput,
       isProfaneNickname,
       setIsProfaneNickname,
+      isChangingPage,
+      setIsChangingPage,
     }),
     [
       messageContent,
@@ -85,6 +92,8 @@ export const AppProvider = (props: any) => {
       setIsProfaneInput,
       isProfaneNickname,
       setIsProfaneNickname,
+      isChangingPage,
+      setIsChangingPage,
     ]
   );
 
@@ -129,4 +138,9 @@ export const useIsProfaneInput = () => {
 export const useIsProfaneNickname = () => {
   const { isProfaneNickname, setIsProfaneNickname } = useContext(AppContext);
   return { isProfaneNickname, setIsProfaneNickname };
+};
+
+export const useIsChangingPage = () => {
+  const { isChangingPage, setIsChangingPage } = useContext(AppContext);
+  return { isChangingPage, setIsChangingPage };
 };
