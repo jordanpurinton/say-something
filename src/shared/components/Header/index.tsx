@@ -29,7 +29,7 @@ export const Header: FC<HeaderProps> = ({ navbarIsOpen, setNavbarIsOpen }) => {
           />
         </MediaQuery>
         <Title order={2}>Say Something</Title>
-        {!isChangingPage && (
+        {isChangingPage && (
           <div style={{ marginLeft: '1em', marginTop: '0.55em' }}>
             <Loader color="white" />
           </div>
