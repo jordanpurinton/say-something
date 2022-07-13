@@ -1,5 +1,5 @@
 import React, { FC, useCallback } from 'react';
-import { Home, Message } from 'tabler-icons-react';
+import { Home, InfoCircle, Message } from 'tabler-icons-react';
 import { ThemeIcon, UnstyledButton, Group, Text } from '@mantine/core';
 import Avatar from '../Avatar';
 import { useRouter } from 'next/router';
@@ -68,18 +68,24 @@ const data: {
   label: string;
   url: string;
 }[] = [
-  { icon: <Home size={16} />, color: 'blue', label: 'Home', url: '/' },
+  { icon: <Home size={24} />, color: 'blue', label: 'Home', url: '/' },
   {
-    icon: <Message size={16} />,
+    icon: <Message size={24} />,
     color: 'teal',
-    label: 'Send History',
+    label: 'Send history',
     url: '/send-history',
   },
   {
-    icon: <Message size={16} />,
+    icon: <Message size={24} />,
     color: 'violet',
-    label: 'View History',
+    label: 'View history',
     url: '/view-history',
+  },
+  {
+    icon: <InfoCircle size={24} />,
+    color: 'orange',
+    label: 'What is this?',
+    url: '/what-is-this',
   },
   {
     icon: <Avatar />,
