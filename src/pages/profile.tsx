@@ -9,6 +9,7 @@ import {
   Modal,
   Space,
   Text,
+  ThemeIcon,
 } from '@mantine/core';
 import type { NextApiRequest, NextApiResponse, NextPage } from 'next';
 import React, { ChangeEvent, useCallback, useEffect, useState } from 'react';
@@ -27,7 +28,7 @@ import { trpc } from '../shared/utils/trpc';
 import { useRouter } from 'next/router';
 import Loading from '../shared/components/Loading';
 import Head from 'next/head';
-import { Logout } from 'tabler-icons-react';
+import { Circle, Logout } from 'tabler-icons-react';
 
 const Profile: NextPage<{
   userData: SerializedUser;
@@ -87,7 +88,14 @@ const Profile: NextPage<{
       </Head>
       <main>
         <PageContainer>
-          <List spacing="sm" size="sm">
+          <List
+            spacing="lg"
+            icon={
+              <ThemeIcon color="blue" size={24} radius="xl">
+                <Circle size={16} />
+              </ThemeIcon>
+            }
+          >
             <Center>
               <Avatar
                 src={user?.image}
@@ -99,7 +107,7 @@ const Profile: NextPage<{
             <Space h="md" />
             {profileTableData.map((obj) => (
               <List.Item key={obj.key}>
-                <b>{obj.label}</b>: {(user as any)[obj.key].toString()}
+                <b>{obj.label}</b> - {(user as any)[obj.key].toString()}
               </List.Item>
             ))}
             <List.Item key="sent">

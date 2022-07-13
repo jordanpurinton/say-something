@@ -1,5 +1,14 @@
-import { Container, List, Space, Text, Title } from '@mantine/core';
+import {
+  Anchor,
+  Container,
+  List,
+  Space,
+  Text,
+  ThemeIcon,
+  Title,
+} from '@mantine/core';
 import { NextPage } from 'next';
+import { CircleCheck, Cpu } from 'tabler-icons-react';
 
 const WhatIsThis: NextPage = () => {
   return (
@@ -19,7 +28,13 @@ const WhatIsThis: NextPage = () => {
       <Container size="sm" px="sm">
         <Title order={3}>What does it do?</Title>
         <Space h="md" />
-        <List>
+        <List
+          icon={
+            <ThemeIcon color="teal" size={24} radius="xl">
+              <CircleCheck size={16} />
+            </ThemeIcon>
+          }
+        >
           <Text weight="bold">
             <List.Item>Sending Messages</List.Item>
           </Text>
@@ -71,12 +86,29 @@ const WhatIsThis: NextPage = () => {
       <Space h="xl" />
 
       <Container size="sm" px="sm">
+        <Title order={3}>
+          Tech stuff <Cpu />
+        </Title>
+        <Space h="md" />
+        <Text>
+          For developers who care about this kind of thing, I was heavily
+          influenced by{' '}
+          <Anchor target="_blank" href="https://create.t3.gg/">
+            create-t3-app
+          </Anchor>{' '}
+          for building this.
+        </Text>
+      </Container>
+      <Space h="xl" />
+      <Space h="xl" />
+
+      <Container size="sm" px="sm">
         <Title order={3}>Finally,</Title>
         <Space h="md" />
         <Text>
           Hope you enjoy 🙂
           <Space h="md" />
-          Please try and be nice when messaging.
+          Please be nice when messaging.
         </Text>
       </Container>
     </>
