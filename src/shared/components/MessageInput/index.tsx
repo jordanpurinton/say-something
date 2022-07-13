@@ -5,14 +5,12 @@ import { MAX_MESSAGE_LENGTH } from '../../constants';
 import { useIsProfaneInput, useMessageContent } from '../../context/AppContext';
 import { useUser } from '../../context/UserContext';
 import styles from '../../styles/MessageInput.module.scss';
-import Filter from 'bad-words';
+import { isProfane } from '../../utils/isProfane';
 
 export const MessageInput: FC = () => {
   const { user } = useUser();
   const { messageContent, setMessageContent } = useMessageContent();
   const { isProfaneInput, setIsProfaneInput } = useIsProfaneInput();
-
-  const filter = useMemo(() => new Filter(), []);
 
   const shouldDisable = useMemo(
     () => isAfter(user?.canSendMessageTimestamp as Date, new Date()),
@@ -23,9 +21,9 @@ export const MessageInput: FC = () => {
     (e: ChangeEvent<HTMLTextAreaElement>) => {
       const { value } = e.target;
       setMessageContent(value);
-      setIsProfaneInput(filter.isProfane(value));
+      setIsProfaneInput(isProfane(value));
     },
-    [setMessageContent, setIsProfaneInput, filter]
+    [setMessageContent, setIsProfaneInput]
   );
 
   return (

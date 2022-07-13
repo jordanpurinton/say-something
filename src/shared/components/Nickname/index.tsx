@@ -4,14 +4,12 @@ import React, { ChangeEvent, FC, useCallback, useMemo } from 'react';
 import { DEFAULT_NICKNAME, NICKNAME_MAX_LENGTH } from '../../constants';
 import { useIsProfaneNickname, useNickname } from '../../context/AppContext';
 import { useUser } from '../../context/UserContext';
-import Filter from 'bad-words';
+import { isProfane } from '../../utils/isProfane';
 
 export const Nickname: FC = () => {
   const { user } = useUser();
   const { nickname, setNickname } = useNickname();
   const { isProfaneNickname, setIsProfaneNickname } = useIsProfaneNickname();
-
-  const filter = useMemo(() => new Filter(), []);
 
   const shouldDisable = useMemo(
     () => isAfter(user?.canSendMessageTimestamp as Date, new Date()),
@@ -22,9 +20,9 @@ export const Nickname: FC = () => {
     (e: ChangeEvent<HTMLInputElement>) => {
       const { value } = e.target;
       setNickname(value);
-      setIsProfaneNickname(filter.isProfane(value));
+      setIsProfaneNickname(isProfane(value));
     },
-    [setNickname, setIsProfaneNickname, filter]
+    [setNickname, setIsProfaneNickname]
   );
 
   return (
