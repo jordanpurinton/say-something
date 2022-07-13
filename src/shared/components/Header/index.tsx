@@ -1,10 +1,12 @@
 import {
   Burger,
   Header as MantineHeader,
+  Loader,
   MediaQuery,
   Title,
 } from '@mantine/core';
-import React, { FC } from 'react';
+import { FC } from 'react';
+import { useIsChangingPage } from '../../context/AppContext';
 import styles from '../../styles/Header.module.scss';
 
 interface HeaderProps {
@@ -13,6 +15,7 @@ interface HeaderProps {
 }
 
 export const Header: FC<HeaderProps> = ({ navbarIsOpen, setNavbarIsOpen }) => {
+  const { isChangingPage } = useIsChangingPage();
   return (
     <MantineHeader className={styles.header} height={60} p="xs">
       <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
@@ -25,7 +28,12 @@ export const Header: FC<HeaderProps> = ({ navbarIsOpen, setNavbarIsOpen }) => {
             mr="xl"
           />
         </MediaQuery>
-        <Title order={2}>Say Something</Title>
+        <Title order={2}>
+          Say Something
+          {isChangingPage && (
+            <Loader style={{ position: 'absolute' }} color="white" />
+          )}
+        </Title>
       </div>
     </MantineHeader>
   );

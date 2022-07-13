@@ -1,8 +1,9 @@
-import React, { FC } from 'react';
+import React, { FC, useCallback } from 'react';
 import { Home, Message } from 'tabler-icons-react';
 import { ThemeIcon, UnstyledButton, Group, Text } from '@mantine/core';
 import Avatar from '../Avatar';
 import { useRouter } from 'next/router';
+import { useIsChangingPage } from '../../context/AppContext';
 
 interface NavBarLinkProps {
   icon: React.ReactNode;
@@ -20,10 +21,13 @@ const NavBarLink: FC<NavBarLinkProps> = ({
   setNavbarIsOpen,
 }: NavBarLinkProps) => {
   const router = useRouter();
-  const handleClick = () => {
+  const { setIsChangingPage } = useIsChangingPage();
+  const handleClick = useCallback(async () => {
+    setIsChangingPage(true);
     setNavbarIsOpen(false);
-    router.push(url);
-  };
+    await router.push(url);
+    setIsChangingPage(false);
+  }, [setIsChangingPage, setNavbarIsOpen, router, url]);
 
   return (
     <UnstyledButton
