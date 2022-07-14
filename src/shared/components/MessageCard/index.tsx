@@ -1,9 +1,8 @@
 import { Message } from '@prisma/client';
-import { Button, Card, Space, Text } from '@mantine/core';
+import { Button, Card, Group, Space, Text } from '@mantine/core';
 import { FC, useCallback } from 'react';
 import { ThumbDown, ThumbUp } from 'tabler-icons-react';
 import { Vote, VoteChoice } from '../../constants';
-import React from 'react';
 import styles from '../../styles/MessageCard.module.scss';
 import { format } from 'date-fns';
 
@@ -43,7 +42,7 @@ export const MessageCard: FC<MessageCardProps> = ({
         {format(message?.createdAt, 'hh:mm a')}
       </Text>
       <Space h="md" />
-      <div>
+      <Group>
         <Button
           className={`${styles.voteButton} ${
             readonly ? styles.disabledVoteButton : ''
@@ -76,7 +75,7 @@ export const MessageCard: FC<MessageCardProps> = ({
         >
           Nice ({message?.upvotes})
         </Button>
-      </div>
+      </Group>
     </Card>
   );
 };
