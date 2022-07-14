@@ -51,6 +51,10 @@ export const throwForbidden = () => {
 export const getVerifiedToken = (
   token: string | undefined
 ): JwtPayload | undefined => {
+  if (!token) {
+    return throwUnauthorized();
+  }
+
   const verified = jwt.verify(token || '', process.env.NEXTAUTH_SECRET || '');
 
   if (!verified) throwUnauthorized();
