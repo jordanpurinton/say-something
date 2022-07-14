@@ -9,7 +9,7 @@ interface MessageCountProps {
 export const MessageCount: FC<MessageCountProps> = ({ count, type }) => {
   return (
     <Container>
-      <Title order={3}>
+      <Title order={4}>
         Showing {count} {type} message{count !== 1 ? 's' : ''}
       </Title>
     </Container>
