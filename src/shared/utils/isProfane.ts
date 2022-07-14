@@ -4,7 +4,7 @@ export const isProfane = (content: string) => {
   const parsedData = JSON.parse(JSON.stringify(data));
   const words = content.split(' ');
   for (const word of words) {
-    if (word in parsedData) {
+    if (word.toLowerCase() in parsedData) {
       return true;
     }
   }
