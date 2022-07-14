@@ -29,7 +29,7 @@ export const MessageCard: FC<MessageCardProps> = ({
     [handleOptimisticVoteUpdate, readonly]
   );
   return (
-    <Card style={{ width: 300, margin: 'auto' }} shadow="md" radius="lg">
+    <Card style={{ maxWidth: 300, margin: 'auto' }} shadow="md" radius="lg">
       <Text size="lg">{message?.content}</Text>
       <Space h="md" />
       <Text size="sm">{message?.views} views</Text>
