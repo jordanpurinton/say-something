@@ -1,11 +1,12 @@
 import { Button, Space } from '@mantine/core';
-import React, { FC, useCallback, useMemo } from 'react';
+import React, { FC, useCallback } from 'react';
 import { RefreshDot } from 'tabler-icons-react';
 import { useUser } from '../../context/UserContext';
 import { trpc } from '../../utils/trpc';
 
 export const AdminResetButton: FC = () => {
   const { user, setUser } = useUser();
+  const [isResetting, setIsResetting] = React.useState(false);
 
   const resetTimeoutsMutation = trpc.useMutation('user.admin-reset-timeouts');
 
@@ -21,18 +22,15 @@ export const AdminResetButton: FC = () => {
     }
   );
 
-  const shouldDisable = useMemo(
-    () => resetTimeoutsMutation.isLoading || findUserQuery.isLoading,
-    [resetTimeoutsMutation.isLoading, findUserQuery.isLoading]
-  );
-
   const handleClick = useCallback(async () => {
-    await resetTimeoutsMutation.mutate();
+    setIsResetting(true);
+    await resetTimeoutsMutation.mutateAsync();
     const fetchUserRes = await findUserQuery.refetch();
     const newUserData = fetchUserRes.data?.user;
     if (newUserData) {
       setUser(newUserData);
     }
+    setIsResetting(false);
   }, [findUserQuery, resetTimeoutsMutation, setUser]);
 
   if (!user?.isAdmin ?? false) {
@@ -46,8 +44,8 @@ export const AdminResetButton: FC = () => {
       <Button
         onClick={handleClick}
         rightIcon={<RefreshDot />}
-        loading={shouldDisable}
-        disabled={shouldDisable}
+        loading={isResetting}
+        disabled={isResetting}
         loaderPosition="right"
         size="md"
         color="red"
