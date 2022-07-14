@@ -35,8 +35,6 @@ export const AdminResetButton: FC = () => {
     }
   }, [findUserQuery, resetTimeoutsMutation, setUser]);
 
-  console.log(user?.isAdmin);
-
   if (!user?.isAdmin ?? false) {
     return null;
   }
