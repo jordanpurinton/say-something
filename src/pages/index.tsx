@@ -18,6 +18,7 @@ import PageContainer from '../shared/containers/PageContainer';
 import { getUserServerSide } from '../shared/utils/getUserServerSide';
 import Loading from '../shared/components/Loading';
 import styles from '../shared/styles/Index.module.scss';
+import AdminResetButton from '../shared/components/AdminResetButton';
 
 const Index: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
   const { data } = useSession();
@@ -55,6 +56,7 @@ const Index: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
             <SendTimer />
             <ViewTimer />
           </Group>
+          <AdminResetButton />
         </PageContainer>
       </main>
     </>

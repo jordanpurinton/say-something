@@ -61,6 +61,7 @@ model User {
     viewedMessageIds        Json?     @default("{}")
     canViewMessageTimestamp DateTime  @default(now())
     canSendMessageTimestamp DateTime  @default(now())
+    isAdmin                 Boolean   @default(false)
 }
 
 model VerificationToken {

@@ -6,6 +6,7 @@ import {
   throwForbidden,
   throwServerError,
   clearCookies,
+  throwUnauthorized,
 } from '../utils';
 
 export default createRouter()
@@ -124,5 +125,24 @@ export default createRouter()
       });
 
       clearCookies(ctx?.res);
+    },
+  })
+  .mutation('admin-reset-timeouts', {
+    async resolve({ ctx }) {
+      const session = await getServerSession(ctx);
+
+      if (!session?.userProfile.isAdmin) {
+        return throwUnauthorized('User must be an admin to reset timeouts.');
+      }
+
+      await prisma.user.updateMany({
+        where: {
+          isAdmin: true,
+        },
+        data: {
+          canSendMessageTimestamp: new Date(),
+          canViewMessageTimestamp: new Date(),
+        },
+      });
     },
   });

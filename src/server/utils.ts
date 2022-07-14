@@ -34,10 +34,10 @@ export const throwServerError = (msg?: string) => {
   });
 };
 
-const throwUnauthorized = () => {
+export const throwUnauthorized = (msg?: string) => {
   throw new trpc.TRPCError({
     code: 'UNAUTHORIZED',
-    message: 'Unauthorized',
+    message: msg || 'Unauthorized',
   });
 };
 

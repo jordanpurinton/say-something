@@ -18,6 +18,7 @@ export const useSetInitUser = (): ((user: SerializedUser) => void) => {
           viewedMessageIds: user.viewedMessageIds,
           canViewMessageTimestamp: new Date(user.canViewMessageTimestamp),
           canSendMessageTimestamp: new Date(user.canSendMessageTimestamp),
+          isAdmin: user.isAdmin,
         });
       } else {
         router.push('/api/auth/signin');
