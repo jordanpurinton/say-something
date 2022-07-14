@@ -29,7 +29,6 @@ export const ViewMessageButton: FC = () => {
     setViewMessageModalIsOpen((prev) => !prev && !isError);
   }, [isError, refetch, setViewMessageModalIsOpen]);
 
-  // TODO: fix disabled not updating when user countdown expires
   return (
     <>
       <Button
