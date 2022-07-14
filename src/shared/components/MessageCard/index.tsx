@@ -56,6 +56,7 @@ export const MessageCard: FC<MessageCardProps> = ({
           loaderPosition="right"
           variant="light"
           color="red"
+          size="xs"
         >
           Bad ({message?.downvotes})
         </Button>
@@ -72,6 +73,7 @@ export const MessageCard: FC<MessageCardProps> = ({
           loaderPosition="right"
           variant="light"
           color="green"
+          size="xs"
         >
           Nice ({message?.upvotes})
         </Button>
