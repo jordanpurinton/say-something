@@ -1,5 +1,5 @@
 import { Center, Container, Space, Text } from '@mantine/core';
-import React, { FC, useMemo } from 'react';
+import { FC, useMemo } from 'react';
 import { useUser } from '../../context/UserContext';
 import { useCountdown } from '../../hooks/useCountdown';
 import { usePrevious } from '../../hooks/usePrevious';
