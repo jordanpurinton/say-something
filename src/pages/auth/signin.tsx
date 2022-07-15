@@ -28,8 +28,7 @@ const SignIn: NextPage<{
       <Space h="xl" />
       <Space h="xl" />
       <Text size="sm">
-        If this is your first time, you will be prompted to create a new
-        account
+        If this is your first time, you will be prompted to create a new account
       </Text>
     </Container>
   );

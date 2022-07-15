@@ -1,11 +1,7 @@
 import { Message, Prisma } from '@prisma/client';
 import { z } from 'zod';
 import { prisma } from '../db/prisma';
-import {
-  throwBadRequest,
-  throwServerError,
-  throwUnauthorized,
-} from '../utils';
+import { throwBadRequest, throwServerError, throwUnauthorized } from '../utils';
 import { createRouter } from './context';
 import { isProfane } from '../../shared/utils/isProfane';
 
