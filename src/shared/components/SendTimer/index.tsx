@@ -13,17 +13,9 @@ export const SendTimer: FC = () => {
     new Date(user?.canSendMessageTimestamp?.toString() as string)
   );
 
-  const findUserQuery = trpc.useQuery(
-    [
-      'user.find',
-      {
-        id: user?.id as string,
-      },
-    ],
-    {
-      enabled: false,
-    }
-  );
+  const findUserQuery = trpc.useQuery(['user.find'], {
+    enabled: false,
+  });
 
   const isDisabled = useMemo(
     () => Number(hours) > 0 || Number(minutes) > 0 || Number(seconds) > 0,

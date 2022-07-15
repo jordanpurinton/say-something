@@ -17,6 +17,7 @@ export const createContext = async ({
       req,
       res,
       prisma,
+      session,
     };
   } catch (err) {
     console.error(err);

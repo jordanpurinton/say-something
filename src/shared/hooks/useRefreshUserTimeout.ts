@@ -6,10 +6,11 @@ export const useRefreshUserTimeout = (
   prevIsDisabled: boolean,
   isDisabled: boolean,
   setUser: Dispatch<SetStateAction<User | undefined>>,
+  // prettier-ignore
   findUserQuery: UseQueryResult<{
     success: boolean;
     user: User | null;
-  }>
+  } | undefined>
 ): void => {
   useEffect(() => {
     const fetchUser = async () => {

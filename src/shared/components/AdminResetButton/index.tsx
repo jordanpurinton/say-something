@@ -10,17 +10,9 @@ export const AdminResetButton: FC = () => {
 
   const resetTimeoutsMutation = trpc.useMutation('user.admin-reset-timeouts');
 
-  const findUserQuery = trpc.useQuery(
-    [
-      'user.find',
-      {
-        id: user?.id as string,
-      },
-    ],
-    {
-      enabled: false,
-    }
-  );
+  const findUserQuery = trpc.useQuery(['user.find'], {
+    enabled: false,
+  });
 
   const handleClick = useCallback(async () => {
     setIsResetting(true);

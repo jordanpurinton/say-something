@@ -17,7 +17,7 @@ const WhatIsThis: NextPage = () => {
         <Title order={3}>What is this? 🤔</Title>
         <Space h="md" />
         <Text>
-          Simply put, this is a rehash of an old project that I had worked on
+          Simply put, this is a rework of an old project that I had worked on
           back in college.
         </Text>
       </Container>

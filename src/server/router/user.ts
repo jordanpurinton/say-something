@@ -1,13 +1,7 @@
 import { z } from 'zod';
 import { prisma } from '../db/prisma';
 import { createRouter } from './context';
-import {
-  getServerSession,
-  throwForbidden,
-  throwServerError,
-  clearCookies,
-  throwUnauthorized,
-} from '../utils';
+import { throwServerError, clearCookies, throwUnauthorized } from '../utils';
 
 export default createRouter()
   .mutation('create', {
@@ -43,69 +37,61 @@ export default createRouter()
     },
   })
   .query('find', {
-    input: z.object({
-      id: z.string(),
-    }),
-    async resolve({ ctx, input }) {
-      const session = await getServerSession(ctx);
-      const sessionId = session?.userProfile.id;
-
-      if (sessionId !== input.id) {
-        return throwForbidden();
+    async resolve({ ctx }) {
+      if (!ctx?.session ?? true) {
+        return throwUnauthorized('Session not found');
       }
 
-      const user = await prisma.user.findUnique({
-        where: {
-          id: input.id,
-        },
-      });
-      return { success: true, user };
+      if (ctx.session) {
+        const user = await prisma.user.findUnique({
+          where: {
+            id: ctx.session.id,
+          },
+        });
+        return { success: true, user };
+      }
     },
   })
   .mutation('update-can-send-message-timestamp', {
     input: z.object({
-      id: z.string(),
       canSendMessageTimestamp: z.string(),
     }),
     async resolve({ ctx, input }) {
-      const session = await getServerSession(ctx);
-      const sessionId = session?.userProfile.id;
-
-      if (sessionId !== input.id) {
-        return throwForbidden();
+      if (!ctx?.session ?? true) {
+        return throwUnauthorized('Session not found');
       }
 
-      await prisma.user.update({
-        where: {
-          id: input.id,
-        },
-        data: {
-          canSendMessageTimestamp: input.canSendMessageTimestamp,
-        },
-      });
+      if (ctx.session) {
+        await prisma.user.update({
+          where: {
+            id: ctx.session.id,
+          },
+          data: {
+            canSendMessageTimestamp: input.canSendMessageTimestamp,
+          },
+        });
+      }
     },
   })
   .mutation('update-can-view-message-timestamp', {
     input: z.object({
-      id: z.string(),
       canViewMessageTimestamp: z.string(),
     }),
     async resolve({ ctx, input }) {
-      const session = await getServerSession(ctx);
-      const sessionId = session?.userProfile.id;
-
-      if (sessionId !== input.id) {
-        return throwForbidden();
+      if (!ctx?.session ?? true) {
+        return throwUnauthorized('Session not found');
       }
 
-      await prisma.user.update({
-        where: {
-          id: input.id,
-        },
-        data: {
-          canViewMessageTimestamp: input.canViewMessageTimestamp,
-        },
-      });
+      if (ctx.session) {
+        await prisma.user.update({
+          where: {
+            id: ctx.session.id,
+          },
+          data: {
+            canViewMessageTimestamp: input.canViewMessageTimestamp,
+          },
+        });
+      }
     },
   })
   .mutation('log-out', {
@@ -116,33 +102,41 @@ export default createRouter()
   })
   .mutation('delete', {
     async resolve({ ctx }) {
-      const session = await getServerSession(ctx);
+      if (!ctx?.session ?? true) {
+        return throwUnauthorized('Session not found');
+      }
 
-      await prisma.user.delete({
-        where: {
-          id: session?.userProfile.id,
-        },
-      });
+      if (ctx.session) {
+        await prisma.user.delete({
+          where: {
+            id: ctx.session.id,
+          },
+        });
 
-      clearCookies(ctx?.res);
+        clearCookies(ctx?.res);
+      }
     },
   })
   .mutation('admin-reset-timeouts', {
     async resolve({ ctx }) {
-      const session = await getServerSession(ctx);
-
-      if (!session?.userProfile.isAdmin) {
-        return throwUnauthorized('User must be an admin to reset timeouts.');
+      if (!ctx?.session ?? true) {
+        return throwUnauthorized('Session not found');
       }
 
-      await prisma.user.updateMany({
-        where: {
-          isAdmin: true,
-        },
-        data: {
-          canSendMessageTimestamp: new Date(),
-          canViewMessageTimestamp: new Date(),
-        },
-      });
+      if (ctx.session) {
+        if (!ctx.session.isAdmin) {
+          return throwUnauthorized('User must be an admin to reset timeouts.');
+        }
+
+        await prisma.user.updateMany({
+          where: {
+            isAdmin: true,
+          },
+          data: {
+            canSendMessageTimestamp: new Date(),
+            canViewMessageTimestamp: new Date(),
+          },
+        });
+      }
     },
   });

@@ -25,17 +25,9 @@ export const SendMessageButton: FC = () => {
   const updateCanSendMessageTimestampMutation = trpc.useMutation(
     'user.update-can-send-message-timestamp'
   );
-  const findUserQuery = trpc.useQuery(
-    [
-      'user.find',
-      {
-        id: user?.id as string,
-      },
-    ],
-    {
-      enabled: false,
-    }
-  );
+  const findUserQuery = trpc.useQuery(['user.find'], {
+    enabled: false,
+  });
 
   const shouldDisable = useMemo(
     () =>
@@ -66,7 +58,6 @@ export const SendMessageButton: FC = () => {
     });
 
     await updateCanSendMessageTimestampMutation.mutateAsync({
-      id: user?.id as string,
       canSendMessageTimestamp: newDate.toISOString(),
     });
 
@@ -82,7 +73,6 @@ export const SendMessageButton: FC = () => {
     messageContent,
     nickname,
     updateCanSendMessageTimestampMutation,
-    user?.id,
     findUserQuery,
     setUser,
     setMessageContent,

@@ -1,7 +1,11 @@
 import { Message, Prisma } from '@prisma/client';
 import { z } from 'zod';
 import { prisma } from '../db/prisma';
-import { getServerSession, throwBadRequest, throwServerError } from '../utils';
+import {
+  throwBadRequest,
+  throwServerError,
+  throwUnauthorized,
+} from '../utils';
 import { createRouter } from './context';
 import { isProfane } from '../../shared/utils/isProfane';
 
@@ -13,100 +17,98 @@ export default createRouter()
     }),
     async resolve({ ctx, input }) {
       const { content, nickname } = input;
-      const session = await getServerSession(ctx);
-      const sessionId = session?.userProfile.id;
 
-      const user = await prisma.user.findUnique({
-        where: {
-          id: sessionId,
-        },
-      });
-
-      if ((user?.canSendMessageTimestamp || -1) > new Date()) {
-        return throwBadRequest('canSendMessageTimestamp must be in the past');
+      if (!ctx?.session ?? true) {
+        return throwUnauthorized('Session not found');
       }
 
-      if (isProfane(content)) {
-        return throwBadRequest('Content is profane. Please be nice.');
-      }
+      if (ctx.session) {
+        const user = await prisma.user.findUnique({
+          where: {
+            id: ctx.session.id,
+          },
+        });
 
-      if (isProfane(nickname)) {
-        return throwBadRequest('Nickname is profane. Please be nice.');
-      }
+        if ((user?.canSendMessageTimestamp || -1) > new Date()) {
+          return throwBadRequest('canSendMessageTimestamp must be in the past');
+        }
 
-      await prisma.message.create({
-        data: { content, userId: sessionId as string, nickname },
-      });
-    },
-  })
-  .query('find', {
-    input: z.object({
-      id: z.string(),
-    }),
-    async resolve({ input }) {
-      const message = await prisma.message.findUnique({
-        where: {
-          id: input.id,
-        },
-      });
-      return { success: true, message };
+        if (isProfane(content)) {
+          return throwBadRequest('Content is profane. Please be nice.');
+        }
+
+        if (isProfane(nickname)) {
+          return throwBadRequest('Nickname is profane. Please be nice.');
+        }
+
+        await prisma.message.create({
+          data: { content, userId: ctx.session.id, nickname },
+        });
+      }
     },
   })
   .query('find-by-user', {
     async resolve({ ctx }) {
-      const session = await getServerSession(ctx);
-      const sessionId = session?.userProfile.id;
-
-      const messages = await prisma.message.findMany({
-        where: {
-          userId: sessionId,
-        },
-      });
-
-      if (messages.length === 0) {
-        return { success: false, messages: [] };
+      if (!ctx?.session ?? true) {
+        return throwUnauthorized('Session not found');
       }
 
-      return { success: true, messages };
+      if (ctx.session) {
+        const messages = await prisma.message.findMany({
+          where: {
+            userId: ctx.session.id,
+          },
+        });
+
+        if (messages.length === 0) {
+          return { success: false, messages: [] };
+        }
+
+        return { success: true, messages };
+      }
     },
   })
   .query('get-random', {
     async resolve({ ctx }) {
-      const session = await getServerSession(ctx);
-
-      const user = await prisma.user.findUnique({
-        where: {
-          id: session?.userProfile.id,
-        },
-      });
-
-      if ((user?.canViewMessageTimestamp || -1) > new Date()) {
-        return throwBadRequest('canViewMessageTimestamp must be in the past');
+      if (!ctx?.session ?? true) {
+        return throwUnauthorized('Session not found');
       }
 
-      const messageArray: Message[] = await prisma.$queryRaw(
-        Prisma.sql`SELECT * FROM Message WHERE userId <> ${user?.id} ORDER BY RAND() LIMIT 1;`
-      );
+      if (ctx.session) {
+        const user = await prisma.user.findUnique({
+          where: {
+            id: ctx.session.id,
+          },
+        });
 
-      const message = messageArray[0];
+        if ((user?.canViewMessageTimestamp || -1) > new Date()) {
+          return throwBadRequest('canViewMessageTimestamp must be in the past');
+        }
 
-      const newViewedMessageIds = (user?.viewedMessageIds ||
-        {}) as Prisma.JsonObject;
+        const messageArray: Message[] = await prisma.$queryRaw(
+          Prisma.sql`SELECT * FROM Message WHERE userId <> ${user?.id} ORDER BY RAND() LIMIT 1;`
+        );
 
-      if (message && !newViewedMessageIds?.hasOwnProperty(message.id)) {
-        newViewedMessageIds[message.id] = true;
+        const message = messageArray[0];
+
+        const newViewedMessageIds = (user?.viewedMessageIds ||
+          {}) as Prisma.JsonObject;
+
+        if (message && !newViewedMessageIds?.hasOwnProperty(message.id)) {
+          newViewedMessageIds[message.id] = true;
+        }
+
+        await prisma.user.update({
+          where: {
+            id: ctx.session?.id,
+          },
+          data: {
+            viewedMessageIds: newViewedMessageIds,
+          },
+        });
+
+        return { success: true, message: message };
       }
-
-      await prisma.user.update({
-        where: {
-          id: session?.userProfile.id,
-        },
-        data: {
-          viewedMessageIds: newViewedMessageIds,
-        },
-      });
-
-      return { success: true, message: message };
     },
   })
   .mutation('upvote-message', {
@@ -114,7 +116,10 @@ export default createRouter()
       id: z.string(),
     }),
     async resolve({ ctx, input }) {
-      const session = await getServerSession(ctx);
+      if (!ctx?.session ?? true) {
+        return throwUnauthorized('Session not found');
+      }
+
       const message = await prisma.message.findUnique({
         where: {
           id: input.id,
@@ -125,7 +130,7 @@ export default createRouter()
         return throwServerError('Message not found');
       }
 
-      if (message.userId === session?.userProfile.id) {
+      if (message.userId === ctx?.session?.id) {
         return throwBadRequest('Cannot upvote your own message');
       }
 
@@ -144,29 +149,34 @@ export default createRouter()
       id: z.string(),
     }),
     async resolve({ ctx, input }) {
-      const session = await getServerSession(ctx);
-      const message = await prisma.message.findUnique({
-        where: {
-          id: input.id,
-        },
-      });
-
-      if (!message) {
-        return throwServerError('Message not found');
+      if (!ctx?.session ?? true) {
+        return throwUnauthorized('Session not found');
       }
 
-      if (message.userId === session?.userProfile.id) {
-        return throwBadRequest('Cannot downvote your own message');
-      }
+      if (ctx.session) {
+        const message = await prisma.message.findUnique({
+          where: {
+            id: input.id,
+          },
+        });
 
-      await prisma.message.update({
-        where: {
-          id: input.id,
-        },
-        data: {
-          downvotes: message.downvotes + 1,
-        },
-      });
+        if (!message) {
+          return throwServerError('Message not found');
+        }
+
+        if (message.userId === ctx.session.id) {
+          return throwBadRequest('Cannot downvote your own message');
+        }
+
+        await prisma.message.update({
+          where: {
+            id: input.id,
+          },
+          data: {
+            downvotes: message.downvotes + 1,
+          },
+        });
+      }
     },
   })
   .mutation('update-views', {
@@ -196,43 +206,46 @@ export default createRouter()
   })
   .query('find-viewed-messages', {
     async resolve({ ctx }) {
-      const session = await getServerSession(ctx);
+      if (!ctx?.session ?? true) {
+        return throwUnauthorized('Session not found');
+      }
 
-      const user = await prisma.user.findUnique({
-        where: {
-          id: session?.userProfile.id,
-        },
-      });
+      if (ctx.session) {
+        const user = await prisma.user.findUnique({
+          where: {
+            id: ctx.session.id,
+          },
+        });
 
-      if (
-        user?.viewedMessageIds &&
-        typeof user?.viewedMessageIds === 'object'
-      ) {
-        let viewedMessageIdsObj = user?.viewedMessageIds;
+        if (
+          user?.viewedMessageIds &&
+          typeof user?.viewedMessageIds === 'object'
+        ) {
+          let viewedMessageIdsObj = user?.viewedMessageIds;
+          let viewedMessageIds: string[] = [];
 
-        let viewedMessageIds: string[] = [];
+          if (viewedMessageIdsObj) {
+            viewedMessageIds = Object.keys(
+              viewedMessageIdsObj as Prisma.JsonObject
+            );
+          }
 
-        if (viewedMessageIdsObj) {
-          viewedMessageIds = Object.keys(
-            viewedMessageIdsObj as Prisma.JsonObject
-          );
-        }
+          let messagesToReturn: Message[] = [];
 
-        let messagesToReturn: Message[] = [];
-
-        if (viewedMessageIds.length > 0) {
-          messagesToReturn = await prisma.message.findMany({
-            where: {
-              id: {
-                in: (viewedMessageIds as []) || [],
+          if (viewedMessageIds.length > 0) {
+            messagesToReturn = await prisma.message.findMany({
+              where: {
+                id: {
+                  in: (viewedMessageIds as []) || [],
+                },
               },
-            },
-          });
-        } else if (viewedMessageIds.length === 0) {
-          return { success: true, messages: [] };
-        }
+            });
+          } else if (viewedMessageIds.length === 0) {
+            return { success: true, messages: [] };
+          }
 
-        return { success: true, messages: messagesToReturn || [] };
+          return { success: true, messages: messagesToReturn || [] };
+        }
       }
     },
   });

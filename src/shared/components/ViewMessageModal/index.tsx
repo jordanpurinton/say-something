@@ -12,7 +12,7 @@ interface Props {
 }
 
 export const ViewMessageModal: FC<Props> = ({ randomMessage }) => {
-  const { user, setUser } = useUser();
+  const { setUser } = useUser();
   const { viewMessageModalIsOpen, setViewMessageModalIsOpen } =
     useViewMessageModalIsOpen();
 
@@ -28,17 +28,9 @@ export const ViewMessageModal: FC<Props> = ({ randomMessage }) => {
   const updateCanViewMessageTimestampMutation = trpc.useMutation(
     'user.update-can-view-message-timestamp'
   );
-  const findUserQuery = trpc.useQuery(
-    [
-      'user.find',
-      {
-        id: user?.id as string,
-      },
-    ],
-    {
-      enabled: false,
-    }
-  );
+  const findUserQuery = trpc.useQuery(['user.find'], {
+    enabled: false,
+  });
 
   const handleClose = useCallback(async () => {
     setViewMessageModalIsOpen((prev) => !prev);
@@ -101,7 +93,6 @@ export const ViewMessageModal: FC<Props> = ({ randomMessage }) => {
 
     const updateUser = async () => {
       await updateCanViewMessageTimestampMutation.mutateAsync({
-        id: user?.id as string,
         canViewMessageTimestamp: newDate.toISOString(),
       });
       const newUserData = await findUserQuery.refetch();
