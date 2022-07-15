@@ -11,9 +11,8 @@ import {
   Text,
   ThemeIcon,
 } from '@mantine/core';
-import type { NextApiRequest, NextApiResponse, NextPage } from 'next';
-import React, { ChangeEvent, useCallback, useEffect, useState } from 'react';
-import { ServerResponse } from 'http';
+import type { GetServerSidePropsContext, NextPage } from 'next';
+import { ChangeEvent, useCallback, useEffect, useState } from 'react';
 import { signOut, useSession } from 'next-auth/react';
 import { SerializedUser } from '../shared/types';
 import { useUser } from '../shared/context/UserContext';
@@ -175,10 +174,7 @@ const Profile: NextPage<{
   );
 };
 
-export async function getServerSideProps(context: {
-  req: NextApiRequest;
-  res: ServerResponse | NextApiResponse<any>;
-}) {
+export async function getServerSideProps(context: GetServerSidePropsContext) {
   const userData = await getUserServerSide(context);
 
   return {

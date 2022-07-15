@@ -35,6 +35,9 @@ const authOptions: NextAuthOptions = {
   theme: {
     colorScheme: 'light',
   },
+  pages: {
+    signIn: '/auth/signin',
+  },
 };
 
 export { authOptions };

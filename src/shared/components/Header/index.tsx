@@ -5,6 +5,7 @@ import {
   MediaQuery,
   Title,
 } from '@mantine/core';
+import { useSession } from 'next-auth/react';
 import { FC } from 'react';
 import { useIsChangingPage } from '../../context/AppContext';
 import styles from '../../styles/Header.module.scss';
@@ -16,6 +17,12 @@ interface HeaderProps {
 
 export const Header: FC<HeaderProps> = ({ navbarIsOpen, setNavbarIsOpen }) => {
   const { isChangingPage } = useIsChangingPage();
+  const { status } = useSession();
+
+  if (status !== 'authenticated') {
+    return null;
+  }
+
   return (
     <MantineHeader className={styles.header} height={60} p="xs">
       <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>

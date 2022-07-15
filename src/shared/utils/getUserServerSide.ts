@@ -1,20 +1,14 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import { ServerResponse } from 'http';
 import { unstable_getServerSession } from 'next-auth';
 import { SerializedUser } from '../types';
 import { authOptions } from '../../pages/api/auth/[...nextauth]';
 import superjson from 'superjson';
 import { clearCookies } from '../../server/utils';
-
-type ServerSideContext = {
-  req: NextApiRequest;
-  res: ServerResponse | NextApiResponse<any>;
-};
+import { GetServerSidePropsContext } from 'next';
 
 type UseGetUserServerSideReturn = SerializedUser | null;
 
 export const getUserServerSide = async (
-  context: ServerSideContext
+  context: GetServerSidePropsContext
 ): Promise<UseGetUserServerSideReturn> => {
   const { req, res } = context;
   try {

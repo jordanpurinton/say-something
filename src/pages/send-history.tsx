@@ -1,8 +1,7 @@
 import { Space } from '@mantine/core';
-import type { NextApiRequest, NextApiResponse, NextPage } from 'next';
+import type { GetServerSidePropsContext, NextPage } from 'next';
 import Head from 'next/head';
-import React, { Fragment, useEffect } from 'react';
-import { ServerResponse } from 'http';
+import { Fragment, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { SerializedUser } from '../shared/types';
 import { useUser } from '../shared/context/UserContext';
@@ -61,10 +60,7 @@ const SendHistory: NextPage<{ userData: SerializedUser }> = ({ userData }) => {
   );
 };
 
-export async function getServerSideProps(context: {
-  req: NextApiRequest;
-  res: ServerResponse | NextApiResponse<any>;
-}) {
+export async function getServerSideProps(context: GetServerSidePropsContext) {
   const userData = await getUserServerSide(context);
   return {
     props: { userData },

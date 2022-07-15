@@ -12,9 +12,12 @@ import { UserProvider } from '../shared/context/UserContext';
 import '../shared/styles/globals.css';
 import Navbar from '../shared/components/Navbar';
 import { AppProvider } from '../shared/context/AppContext';
+import { useRouter } from 'next/router';
 
 const App: AppType = ({ Component, pageProps: { session, ...pageProps } }) => {
   const [navbarIsOpen, setNavbarIsOpen] = React.useState(false);
+  const router = useRouter();
+
   return (
     <>
       <Head>
@@ -25,43 +28,47 @@ const App: AppType = ({ Component, pageProps: { session, ...pageProps } }) => {
         />
       </Head>
 
-      <MantineProvider
-        withGlobalStyles
-        withNormalizeCSS
-        theme={{
-          colorScheme: 'light',
-          primaryColor: 'indigo',
-        }}
-      >
-        <SessionProvider session={session}>
-          <AppProvider>
-            <UserProvider>
-              <NotificationsProvider>
-                <AppShell
-                  padding="md"
-                  navbarOffsetBreakpoint="sm"
-                  asideOffsetBreakpoint="sm"
-                  fixed
-                  header={
-                    <Header
-                      navbarIsOpen={navbarIsOpen}
-                      setNavbarIsOpen={setNavbarIsOpen}
-                    />
-                  }
-                  navbar={
-                    <Navbar
-                      navbarIsOpen={navbarIsOpen}
-                      setNavbarIsOpen={setNavbarIsOpen}
-                    />
-                  }
-                >
-                  <Component {...pageProps} />
-                </AppShell>
-              </NotificationsProvider>
-            </UserProvider>
-          </AppProvider>
-        </SessionProvider>
-      </MantineProvider>
+      {!router.pathname.includes('auth') ? (
+        <MantineProvider
+          withGlobalStyles
+          withNormalizeCSS
+          theme={{
+            colorScheme: 'light',
+            primaryColor: 'indigo',
+          }}
+        >
+          <SessionProvider session={session}>
+            <AppProvider>
+              <UserProvider>
+                <NotificationsProvider>
+                  <AppShell
+                    padding="md"
+                    navbarOffsetBreakpoint="sm"
+                    asideOffsetBreakpoint="sm"
+                    fixed
+                    header={
+                      <Header
+                        navbarIsOpen={navbarIsOpen}
+                        setNavbarIsOpen={setNavbarIsOpen}
+                      />
+                    }
+                    navbar={
+                      <Navbar
+                        navbarIsOpen={navbarIsOpen}
+                        setNavbarIsOpen={setNavbarIsOpen}
+                      />
+                    }
+                  >
+                    <Component {...pageProps} />
+                  </AppShell>
+                </NotificationsProvider>
+              </UserProvider>
+            </AppProvider>
+          </SessionProvider>
+        </MantineProvider>
+      ) : (
+        <Component {...pageProps} />
+      )}
     </>
   );
 };
