@@ -3,12 +3,22 @@ import { SerializedUser } from '../types';
 import { authOptions } from '../../pages/api/auth/[...nextauth]';
 import superjson from 'superjson';
 import { clearCookies } from '../../server/utils';
-import { GetServerSidePropsContext } from 'next';
+import {
+  GetServerSidePropsContext,
+  NextApiRequest,
+  NextApiResponse,
+} from 'next';
+import { ServerResponse } from 'http';
+
+type TrpcReqRes = {
+  req: NextApiRequest;
+  res: ServerResponse | NextApiResponse<any>;
+};
 
 type UseGetUserServerSideReturn = SerializedUser | null;
 
 export const getUserServerSide = async (
-  context: GetServerSidePropsContext
+  context: GetServerSidePropsContext | TrpcReqRes
 ): Promise<UseGetUserServerSideReturn> => {
   const { req, res } = context;
   try {
