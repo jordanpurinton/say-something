@@ -17,8 +17,8 @@ const WhatIsThis: NextPage = () => {
         <Title order={3}>What is this? 🤔</Title>
         <Space h="md" />
         <Text>
-          Simply put, this is a rework of an old project that I had worked on
-          back in college.
+          Simply put, this is a rework of an old project I built back in
+          college.
         </Text>
       </Container>
 
@@ -42,11 +42,11 @@ const WhatIsThis: NextPage = () => {
           <Text>
             If you click the &quot;Send Message&quot; button on the home page,
             it will send the message to our backend and store the message. This
-            message has the potential to be viewed by anyone. No personal data
-            is available to the person who reads your message outside of the
-            message content, the number of views a message has, your selected
-            nickname, the date is was sent and the number of upvotes your
-            message has.
+            message has the potential to be viewed by any user of this
+            application. No personal data is available to the person who reads
+            your message outside of the message content, the number of views a
+            message has, your selected nickname, the date the message was sent and the
+            number of upvotes and downvotes your message has.
           </Text>
           <Space h="md" />
           <Text weight="bold">
