@@ -45,8 +45,8 @@ const WhatIsThis: NextPage = () => {
             message has the potential to be viewed by any user of this
             application. No personal data is available to the person who reads
             your message outside of the message content, the number of views a
-            message has, your selected nickname, the date the message was sent and the
-            number of upvotes and downvotes your message has.
+            message has, your selected nickname, the date the message was sent
+            and the number of upvotes and downvotes your message has.
           </Text>
           <Space h="md" />
           <Text weight="bold">

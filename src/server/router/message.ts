@@ -179,7 +179,11 @@ export default createRouter()
     input: z.object({
       id: z.string(),
     }),
-    async resolve({ input }) {
+    async resolve({ ctx, input }) {
+      if (!ctx?.session ?? true) {
+        return throwUnauthorized('Session not found');
+      }
+
       const message = await prisma.message.findUnique({
         where: {
           id: input.id,
