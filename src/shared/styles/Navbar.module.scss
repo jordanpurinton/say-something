@@ -1,5 +1,5 @@
-@media (max-width: 768px) {
-  .navbar {
-    background-color: #fffffff2;
-  }
+.navbar > * > button {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
 }

@@ -20,7 +20,7 @@ const Navbar: FC<NavbarProps> = ({ navbarIsOpen, setNavbarIsOpen }) => {
     <MantineNavbar
       className={styles.navbar}
       hidden={!navbarIsOpen}
-      width={{ sm: 200, lg: 200 }}
+      width={{ sm: 150, lg: 150 }}
       hiddenBreakpoint="sm"
       p="md"
     >

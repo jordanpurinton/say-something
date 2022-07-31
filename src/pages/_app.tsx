@@ -16,6 +16,9 @@ import { useRouter } from 'next/router';
 
 const App: AppType = ({ Component, pageProps: { session, ...pageProps } }) => {
   const [navbarIsOpen, setNavbarIsOpen] = React.useState(false);
+  const [selectedTheme, setSelectedTheme] = React.useState<'light' | 'dark'>(
+    'light'
+  );
   const router = useRouter();
 
   return (
@@ -33,7 +36,7 @@ const App: AppType = ({ Component, pageProps: { session, ...pageProps } }) => {
           withGlobalStyles
           withNormalizeCSS
           theme={{
-            colorScheme: 'light',
+            colorScheme: selectedTheme,
             primaryColor: 'indigo',
           }}
         >
@@ -50,6 +53,8 @@ const App: AppType = ({ Component, pageProps: { session, ...pageProps } }) => {
                       <Header
                         navbarIsOpen={navbarIsOpen}
                         setNavbarIsOpen={setNavbarIsOpen}
+                        selectedTheme={selectedTheme}
+                        setSelectedTheme={setSelectedTheme}
                       />
                     }
                     navbar={

@@ -1,4 +1,5 @@
 import {
+  ActionIcon,
   Burger,
   Header as MantineHeader,
   Loader,
@@ -6,18 +7,30 @@ import {
   Title,
 } from '@mantine/core';
 import { useSession } from 'next-auth/react';
-import { FC } from 'react';
+import { Dispatch, FC, SetStateAction, useCallback } from 'react';
+import { Moon, Sun } from 'tabler-icons-react';
 import { useIsChangingPage } from '../../context/AppContext';
 import styles from '../../styles/Header.module.scss';
 
 interface HeaderProps {
   navbarIsOpen: boolean;
   setNavbarIsOpen: (navbarIsOpen: boolean) => void;
+  selectedTheme: 'light' | 'dark';
+  setSelectedTheme: Dispatch<SetStateAction<'light' | 'dark'>>;
 }
 
-export const Header: FC<HeaderProps> = ({ navbarIsOpen, setNavbarIsOpen }) => {
+export const Header: FC<HeaderProps> = ({
+  navbarIsOpen,
+  setNavbarIsOpen,
+  selectedTheme,
+  setSelectedTheme,
+}) => {
   const { isChangingPage } = useIsChangingPage();
   const { status } = useSession();
+
+  const handleThemeChange = useCallback(() => {
+    setSelectedTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+  }, [setSelectedTheme]);
 
   if (status !== 'authenticated') {
     return null;
@@ -41,6 +54,14 @@ export const Header: FC<HeaderProps> = ({ navbarIsOpen, setNavbarIsOpen }) => {
             <Loader color="white" />
           </div>
         )}
+      </div>
+      <div className={styles.themeToggle}>
+        <ActionIcon
+          onClick={() => handleThemeChange()}
+          color={selectedTheme === 'light' ? 'dark' : 'yellow'}
+        >
+          {selectedTheme === 'light' ? <Moon /> : <Sun />}
+        </ActionIcon>
       </div>
     </MantineHeader>
   );

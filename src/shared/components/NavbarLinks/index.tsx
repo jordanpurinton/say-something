@@ -1,6 +1,6 @@
 import React, { FC, useCallback } from 'react';
 import { Home, InfoCircle, Message } from 'tabler-icons-react';
-import { ThemeIcon, UnstyledButton, Group, Text } from '@mantine/core';
+import { ThemeIcon, UnstyledButton, Text, Center, Space } from '@mantine/core';
 import Avatar from '../Avatar';
 import { useRouter } from 'next/router';
 import { useIsChangingPage } from '../../context/AppContext';
@@ -48,16 +48,17 @@ const NavBarLink: FC<NavBarLinkProps> = ({
         },
       })}
     >
-      <Group>
-        {label !== 'Profile' ? (
-          <ThemeIcon color={color} size="xl" variant="light">
-            {icon}
-          </ThemeIcon>
-        ) : (
-          icon
-        )}
-        <Text size="sm">{label}</Text>
-      </Group>
+      {label !== 'Profile' ? (
+        <ThemeIcon color={color} size="xl" variant="light">
+          {icon}
+        </ThemeIcon>
+      ) : (
+        icon
+      )}
+      <Space h="xs" />
+      <Center>
+        <Text size="xs">{label}</Text>
+      </Center>
     </UnstyledButton>
   );
 };
